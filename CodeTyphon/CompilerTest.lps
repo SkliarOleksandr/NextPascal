@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="9"/>
+    <BuildModes Active="Default"/>
+    <Units Count="20">
+      <Unit0>
+        <Filename Value="CompilerTest.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="61"/>
+        <CursorPos X="22" Y="38"/>
+        <UsageCount Value="62"/>
+      </Unit0>
+      <Unit1>
+        <Filename Value="..\Compiler\NativeCalls\NativeCalls.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="88"/>
+        <CursorPos X="14" Y="103"/>
+        <UsageCount Value="31"/>
+      </Unit1>
+      <Unit2>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallARM32.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="8"/>
+      </Unit2>
+      <Unit3>
+        <Filename Value="C:\codetyphon\fpcsrc\packages\fcl-base\src\custapp.pp"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="6"/>
+      </Unit3>
+      <Unit4>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallsAutoTests.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="55" Y="6"/>
+        <UsageCount Value="23"/>
+      </Unit4>
+      <Unit5>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallX86.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="93" Y="12"/>
+        <UsageCount Value="9"/>
+      </Unit5>
+      <Unit6>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallX64.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="60" Y="10"/>
+        <UsageCount Value="12"/>
+      </Unit6>
+      <Unit7>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallX86New.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="324"/>
+        <CursorPos X="40" Y="410"/>
+        <UsageCount Value="10"/>
+      </Unit7>
+      <Unit8>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallsAutoTestsNew.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1957"/>
+        <CursorPos X="5" Y="2003"/>
+        <UsageCount Value="26"/>
+      </Unit8>
+      <Unit9>
+        <Filename Value="C:\codetyphon\fpcsrc\rtl\objpas\typinfo.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="33"/>
+        <CursorPos X="67" Y="45"/>
+        <UsageCount Value="18"/>
+      </Unit9>
+      <Unit10>
+        <Filename Value="..\Compiler\ILTypeInfo.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="18"/>
+      </Unit10>
+      <Unit11>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallX64New.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="463"/>
+        <CursorPos X="14" Y="427"/>
+        <UsageCount Value="17"/>
+      </Unit11>
+      <Unit12>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallsWithOldIntf.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="36"/>
+        <CursorPos X="89" Y="59"/>
+        <UsageCount Value="9"/>
+      </Unit12>
+      <Unit13>
+        <Filename Value="..\Compiler\CompilerUtils.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="7"/>
+        <CursorPos X="79" Y="32"/>
+        <UsageCount Value="9"/>
+      </Unit13>
+      <Unit14>
+        <Filename Value="..\Compiler\AVL.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="25" Y="9"/>
+        <UsageCount Value="9"/>
+      </Unit14>
+      <Unit15>
+        <Filename Value="..\Compiler\NativeCalls\old\NativeCallARM32.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="24"/>
+        <CursorPos X="38" Y="44"/>
+        <UsageCount Value="9"/>
+      </Unit15>
+      <Unit16>
+        <Filename Value="..\Compiler\NativeCalls\old\NativeCallsAutoTests.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="679"/>
+        <CursorPos X="56" Y="682"/>
+        <UsageCount Value="9"/>
+      </Unit16>
+      <Unit17>
+        <Filename Value="..\Compiler\NativeCalls\NativeCallARM32New.pas"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="649"/>
+        <CursorPos X="13" Y="684"/>
+        <UsageCount Value="16"/>
+        <Bookmarks Count="2">
+          <Item0 X="29" Y="359" ID="9"/>
+          <Item1 X="4" Y="553" ID="8"/>
+        </Bookmarks>
+      </Unit17>
+      <Unit18>
+        <Filename Value="..\Compiler\compilers.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="66"/>
+        <CursorPos X="21" Y="101"/>
+        <UsageCount Value="9"/>
+      </Unit18>
+      <Unit19>
+        <Filename Value="..\CAT\CATNativeCallsTests.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="10"/>
+      </Unit19>
+    </Units>
+    <JumpHistory HistoryIndex="-1"/>
+  </ProjectSession>
+</CONFIG>

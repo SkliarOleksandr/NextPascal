@@ -1,0 +1,60 @@
+===============================
+ Ассациативное перечесление
+===============================
+
+1.
+
+type  
+   TEnum(name: string) = (
+     Item1 'item desc 1', 
+     Item2 'item desc 2', 
+     Item3 'item desc 3'
+   );   
+begin
+  var S := TEnum.Name(Item1);
+end;   
+
+2.
+
+type  
+	TRec = record
+	  X, Y: Integer;
+	end;
+      
+	TEnum(R: TRec) = (
+     Item1 [1, 2], 
+     Item2 [3, 4], 
+     Item3 [5, 6]
+   );   
+begin
+  var R := TEnum.R(Item1);
+  var X := TEnum.R(Item1).X;
+  var X := TEnum.Y(Item1).Y;
+end; 
+
+3.
+
+type  
+      
+	TEnum(record X, Y, Z: float32 end) = (
+		Item1: [1.1, 2.1, 3.1],
+		Item1: [1.2, 2.2, 3.3]     
+	);   
+   
+begin
+  var R := TEnum.Value(Item1);  
+end; 
+
+4.
+
+type  
+      
+	TEnum0 = (e0);	  
+	TEnum1 = (e1, e2);
+	TEnum2(TEnum1) = (e3, e4);
+	TEnum3(TEnum0, TEnum1);
+
+	
+begin
+  var R := TEnum.Value(Item1);  
+end; 

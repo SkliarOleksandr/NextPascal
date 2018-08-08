@@ -1,0 +1,47 @@
+
+type
+  TRec = record
+	  a, b: int32;
+	end;
+	
+
+var
+ 	List: array [5] of TRec;
+
+procedure SS(ref Value: TRec);
+var
+  V: TRec;
+begin
+  V := Value; // OK
+end;
+	
+ref
+  X: TRec = List[0];	// OK 
+	
+  TC = class
+	private
+	  ref F: TRec;
+		var FA: array [5] of TRec;
+	public    
+		procedure TT;
+	end;	
+	
+procedure TC.TT;
+ref
+  a: TRec;
+begin
+  a := List[0]; // OK
+	
+	SS(a); // OK
+	
+	X := a; // FAIL
+	
+	F := a; // FAIL;
+			
+	F := FA[0]; // OK
+	a := FA[0]; // OK
+	 
+  X := FA[0]; // FAIL;
+	
+end;	
+

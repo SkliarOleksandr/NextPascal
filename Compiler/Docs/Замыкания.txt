@@ -1,0 +1,89 @@
+//  ЗАМЫКАНИЯ (CLOSURE).
+  
+  
+1. Замыкание создает анонимный класс с именем процедуры в которой оно обьявленно.
+	procedure ProcX;	
+	begin
+		var p1 := procedure ...  // название класса TProcX$Closure1
+		var p2 := procedure ...  // название класса TProcX$Closure2
+	end;
+	  
+	  
+2. Все захваченные переменные (не параметры) есть поля анонимного класса замыкания.    
+	procedure ProcX;
+	var
+	  x, y, R: integer;
+	begin		
+		var p := 					// у класса TProcX$Closure1 есть метод TProcX$Closure1.Call(z: integer);
+	    procedure (z: integer) 
+		begin	
+		  R := (x + y)*z;         	// переменные R, x, y храняться как поля класса TProcX$Closure1, z - параметр, Self - неявный параметр срыт из области видимости
+		end;
+	end;
+	
+	
+//  КОРОТКИЙ СИНТАКСИС (ЛЯМБДЫ)	
+
+ 
+	procedure ProcX;
+	var
+	  x: int32;	  
+	begin
+		// Java -like 
+		var p := ()->writeln(x);
+		var p := ()[x]->writeln(x);
+		var p := ()[var x]->writeln(x);
+		var p := (a, b: int32)->a - b;
+
+		// c++ -like
+		var p := [:]writeln(x);
+		var p := [:x]writeln(x);
+		var p := [:var x]writeln(x);
+		var p := [:](a, b: int32)a - b;
+		var p := [:](a, b: int32)[a - b];
+
+		// c# -like 
+		var p := ()=> writeln(x);
+		var p := (x, y: integer) => x = y;	  	 
+		var p := ()=> writeln(x);
+		var p := ()=> writeln(x); 
+
+		// new style 1
+		var p := ||writeln(x);
+		var p := |a, b: integer|writeln(a + b);
+
+		// new style 2
+		var p := ::writeln(x);
+		var p := ::(a, b: integer)->writeln(a + b);
+		var p := ::(a, b)->a + b;
+		var p := ::[x](a, b)->a + b*x;
+		var p := ::[var x](a, b)->x := a + b;
+		
+
+		// new style 3
+		var p := ~writeln(x);
+		var p := ~(a, b: integer)->writeln(a + b);
+		var p := ~(a, b)->a + b;
+		var p := ~[x](a, b)->a + b*x;
+		var p := ~[var x](a, b)->x := a + b;	  
+	     
+	  
+	    // C++ like stile 2
+		var p := ()-> writeln(x);	 
+		var p := (a, b: integer)->writeln(a + b);
+		var p := (a, b)->Exit(a + b);	  
+		var p := [x]->writeln(x); 		// x захвачен по значению
+		var p := [var x]->writeln(x); 	// x захвачен по ссылке	  
+		var p := []()->writeln(x); 	// x захвачен по ссылке	  
+
+
+		////////////////////////////////////////////// принято за основу!!!	
+		var p := ~ writeln(x);
+		var p := ~ begin writeln(x); writeln(y); end;
+		var p := ~(a, b: integer) writeln(a + b);
+		var p := ~(a, b) a + b;
+		var p := ~[x](a, b) a + b*x;
+		var p := ~[var x](a, b) x := a + b;	
+	       
+	end;
+

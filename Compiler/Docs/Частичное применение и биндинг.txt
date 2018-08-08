@@ -1,0 +1,34 @@
+синтаксис обьявления:
+
+  function Func(a, b, c: int32): int32;
+  begin
+    Result := (a + b)*c;
+  end;
+
+
+синтаксис получения ссылки на частично примененную функцию:
+
+  ...
+  // усекаем параметры  
+  var F := partial Func(a, b, 10: int32): int32; // 1 вариант (только частичное применение)
+  
+  var F := bind Func(a, b, 10); // 2 вариант
+
+  var F := bind(Func(a, b, c: int32): int32, a, b, 10); // 3 вариант (с полным указанием сигнатуры)
+
+  // переворачиваем параметры
+  var F := bind(Func, c, b, a); 
+
+  // дополняем параметры  
+  var F := bind Func(a, b, c: int32) to Func(z, a, b, c, d, e: int32);
+  ...
+  
+  var R := F(1, 2); // R = 30
+
+
+  TF = function(c, b, a, d, e: int32): int32;
+
+  ...
+
+  var F: TF = bind Func(a, b, c: int32): int32 to TF(a, b, c);
+

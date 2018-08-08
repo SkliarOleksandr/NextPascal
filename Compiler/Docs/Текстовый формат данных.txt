@@ -1,0 +1,94 @@
+вариант JSON:
+
+{
+	"x": 5,
+	"y": 6,
+	"z": {
+	  a: "aaa",
+	  b: "bbb",
+	}
+	"arr": [1, 2, 3, 4]
+}
+
+
+вариант типа DFM:
+
+object XXX: TObject
+	x = 5
+	y = 6
+	object z : TZ
+	  a = "aaa"
+	  b = "bbb"
+	end
+	arr = [1, 2, 3, 4]
+end
+
+
+вариант типа CRI:
+
+{
+	x: int32 = 1
+	y: int32 = 2
+	z = {
+		a: string = "aaa"
+		b: string = "bbb"
+	}
+	arr = [1, 2, 3, 4]
+}
+
+
+TForm {
+ 	Name = 'form1'
+	x = 1
+	y = 2
+	z = TRec {
+	    a = "aaa"
+		b = "bbb"
+	}
+	arr = [1, 2, 3, 4]
+}
+
+TForm {
+ 	Name = 'form1'
+	x = 1
+	y = 2
+	z = {
+	  a = "aaa"
+	  b = "bbb"
+	}
+	arr = [1, 2, 3, 4]
+}
+
+TForm {
+ 	Name = 'form1'
+	x = 1
+	y = 2
+	components = [
+	  TLable {
+	    Text = 'text1'
+	    Left = 10
+	  },
+	  TLable {
+	    Text = 'text2'
+	    Left = 20
+	  }
+	]
+}
+
+
+{
+ 	Name: string = 'form1'
+	x: int32 = 1
+	y: int64 = 2
+	components: array of TLable = [
+	  {
+	    Text = 'text1'
+	    Left = 10
+	  },
+	  {
+	    Text = 'text2'
+	    Left = 20
+	  }
+	]
+}
+
