@@ -14,7 +14,8 @@ type
     FCompilerMessage: TCompilerMessage;
     function GetCompilerMessage: PCompilerMessage;
   public
-    constructor Create(const MessageText: string; const SourcePosition: TTextPosition);
+    constructor Create(const MessageText: string); overload;
+    constructor Create(const MessageText: string; const SourcePosition: TTextPosition); overload;
     constructor CreateAsInteranl(const MessageText: string; const SourcePosition: TTextPosition);
     property CompilerMessage: PCompilerMessage read GetCompilerMessage;
   end;
@@ -1540,6 +1541,7 @@ type
     property Items[const Key: TIDDeclaration]: TObject read GetItem;
   end;
 
+  procedure AbortWork(Error: TCompilerError); overload;
   procedure AbortWork(Error: TCompilerError; const SourcePosition: TTextPosition); overload;
   procedure AbortWork(Error: TCompilerError; const Params: array of const; const SourcePosition: TTextPosition); overload;
 
@@ -1682,6 +1684,14 @@ end;
 procedure AbortWorkInternal(const Message: string; const Params: array of const; const SourcePosition: TTextPosition);
 begin
   raise ECompilerAbort.CreateAsInteranl(Format(Message, Params), SourcePosition);
+end;
+
+procedure AbortWork(Error: TCompilerError);
+var
+  ErrorStr: string;
+begin
+  ErrorStr := GetErrorText(Error);
+  raise ECompilerAbort.Create(ErrorStr);
 end;
 
 procedure AbortWork(Error: TCompilerError; const SourcePosition: TTextPosition); overload;
@@ -3672,6 +3682,12 @@ begin
 end;
 
 { EComplilerAbort }
+
+constructor ECompilerAbort.Create(const MessageText: string);
+begin
+  inherited Create(MessageText);
+  FCompilerMessage := TCompilerMessage.Create(nil, cmtError, MessageText, TTextPosition.Create(0, 0));
+end;
 
 constructor ECompilerAbort.Create(const MessageText: string; const SourcePosition: TTextPosition);
 begin

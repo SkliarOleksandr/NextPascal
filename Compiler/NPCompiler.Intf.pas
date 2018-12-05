@@ -81,7 +81,8 @@ uses NPCompiler, NPCompiler.Messages, NPCompiler.Utils;
 
 { TCompilerMessage }
 
-constructor TCompilerMessage.Create(DeclUnit: TObject; MessageType: TCompilerMessageType; const MessageText: string; const SourcePosition: TTextPosition);
+constructor TCompilerMessage.Create(DeclUnit: TObject; MessageType: TCompilerMessageType; const MessageText: string;
+                                    const SourcePosition: TTextPosition);
 begin
   FUnit := DeclUnit;
   FMessageType := MessageType;

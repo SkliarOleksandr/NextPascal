@@ -2,19 +2,20 @@
 
 interface
 
-uses NPCompiler, NPCompiler.Classes, NPCompiler.DataTypes, NPCompiler.Errors, SystemUnit, IL.Instructions;
+uses NPCompiler, NPCompiler.Classes, NPCompiler.DataTypes, NPCompiler.Errors, SystemUnit, IL.Instructions,
+  NPCompiler.Contexts, NPCompiler.ExpressionContext;
 
 type
   {ôóíêöèÿ: typeid}
   TSF_typeid = class(TIDSysRuntimeFunction)
   protected
-    function Process(const SContext: PSContext): TIDExpression; override;
+    function Process(var EContext: TEContext): TIDExpression; override;
   end;
 
   {ôóíêöèÿ: now}
   TSF_now = class(TIDSysRuntimeFunction)
   protected
-    function Process(const SContext: PSContext): TIDExpression; override;
+    function Process(var EContext: TEContext): TIDExpression; override;
   end;
 
   {function: StaticAssert}
@@ -29,7 +30,8 @@ implementation
 
 { TSF_typeid }
 
-function TSF_typeid.Process(const SContext: PSContext): TIDExpression;
+
+function TSF_typeid.Process(var EContext: TEContext): TIDExpression;
 var
   UN: TNPUnit;
   Expr: TIDExpression;
@@ -37,9 +39,9 @@ var
   TypeID: TDataTypeID;
   RDecl: TIDIntConstant;
 begin
-  UN := SContext.CurUnit;
+  UN := GetUnit(EContext);
   // ÷èòàåì àðãóìåíò
-  Expr := UN.RPNPopExpression;
+  Expr := UN.RPNPopExpression(EContext);
   Decl := Expr.Declaration;
 
   case Decl.ItemType of
@@ -56,13 +58,13 @@ end;
 
 { TSF_now }
 
-function TSF_now.Process(const SContext: PSContext): TIDExpression;
+function TSF_now.Process(var EContext: TEContext): TIDExpression;
 var
   ILCode: TILInstruction;
 begin
-  Result := SContext.GetTMPVarExpr(SYSUnit._DateTime, SContext.CurUnit.parser_Position);
+  Result := EContext.SContext.GetTMPVarExpr(SYSUnit._DateTime, GetUnit(EContext).parser_Position);
   ILCode := TIL.IL_Now(Result);
-  SContext.ILWrite(ILCode);
+  EContext.SContext.ILWrite(ILCode);
 end;
 
 { TSF_StaticAssert }
@@ -72,8 +74,8 @@ var
   TextExpr, Expr: TIDExpression;
 begin
   // читаем второй аргумент
-  TextExpr := Ctx.UN.RPNPopExpression();
-  Expr := Ctx.UN.RPNPopExpression();
+  TextExpr := Ctx.UN.RPNPopExpression(Ctx.EContext^);
+  Expr := Ctx.UN.RPNPopExpression(Ctx.EContext^);
   Ctx.UN.CheckConstExpression(Expr);
   if not Expr.AsBoolConst.Value then
   begin

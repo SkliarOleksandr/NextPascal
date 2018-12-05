@@ -16,7 +16,8 @@ type
 
 implementation
 
-uses iDStringParser, NPCompiler.Parser, NPCompiler, SystemUnit, IL.Types, NPCompiler.DataTypes, NPCompiler.Errors;
+uses iDStringParser, NPCompiler.Parser, NPCompiler, SystemUnit, IL.Types, NPCompiler.DataTypes, NPCompiler.Errors,
+  NPCompiler.ExpressionContext;
 
 type
   TILPlatform = class(TIDPlatform)
@@ -74,11 +75,11 @@ function TILPlatform.ParseArgument(const Context: THWPContext; out Arg: TIDExpre
 var
   EContext: TEContext;
 begin
-  EContext.Initialize;
+  EContext.Initialize(nil);
   EContext.EPosition := ExprNested;
   Result := Context.Parser.NextToken;
   Result := TNPUnit(Context.AUnit).ParseExpression(Context.Scope, EContext, Result);
-  Arg := EContext.ResultExpression; // заменить на RPNPopExpression
+  Arg := EContext.Result;
   TNPUnit(Context.AUnit).CheckEmptyExpression(Arg);
 end;
 

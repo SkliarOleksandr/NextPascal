@@ -316,8 +316,14 @@ begin
         Result := ParseQuoteMulti(Ch, SPos);
         Exit;
       end;
-      ttOneLineRem: ParseOneLineRem(SPos);
-      ttStartRem: ParseMultiLineRem(Token.TokenID, SPos);
+      ttOneLineRem: begin
+        ParseOneLineRem(SPos);
+        ReadedChars := 1;
+      end;
+      ttStartRem: begin
+        ParseMultiLineRem(Token.TokenID, SPos);
+        ReadedChars := 1;
+      end;
       ttEndRem: begin
         if RemID <> -1 then
         begin
