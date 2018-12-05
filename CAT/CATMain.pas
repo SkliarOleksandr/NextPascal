@@ -784,12 +784,12 @@ procedure TfrmCATMain.BuildLLVM(const Src: string);
 var
   TR: TLLVMTranslator;
 begin
-  TR := TLLVMTranslator.Create;
+ { TR := TLLVMTranslator.Create;
   try
 
   finally
     TR.Free;
-  end;
+  end;}
 end;
 
 procedure TfrmCATMain.cbReportMemLeaksClick(Sender: TObject);
@@ -1883,7 +1883,28 @@ begin
   vm.sys.console.SetLogProc(CWriteStr);
 end;
 
+function GetBool1(Cond: Boolean): Boolean;
+begin
+  Result := Cond;
+end;
+
+function GetBool2(Cond: Boolean): Boolean;
+begin
+  Result := Cond;
+end;
+
+function GetBool3(Cond: Boolean): Boolean;
+begin
+  Result := Cond;
+end;
+
+procedure Test5;
+begin
+  B := GetBool1(True) or GetBool2(False) and GetBool3(True);
+end;
+
 initialization
+  Test5();
   Test1();
   Test2();
   Test3();

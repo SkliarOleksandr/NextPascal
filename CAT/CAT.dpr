@@ -54,7 +54,9 @@ uses
   NPCompiler.Evaluater.VM in '..\Compiler\NPCompiler.Evaluater.VM.pas',
   NPCompiler.ConstCalculator in '..\Compiler\NPCompiler.ConstCalculator.pas',
   IL2LLVMTranslator in '..\ILTranslators\LLVM\IL2LLVMTranslator.pas',
-  dwsLLVM in '..\ILTranslators\LLVM\dwsLLVM.pas';
+  dwsLLVM in '..\ILTranslators\LLVM\dwsLLVM.pas',
+  NPCompiler.ExpressionContext in '..\Compiler\NPCompiler.ExpressionContext.pas',
+  NPCompiler.Contexts in '..\Compiler\NPCompiler.Contexts.pas';
 
 {$R *.res}
 

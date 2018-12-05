@@ -27,7 +27,7 @@ var
   O: TC;
 begin
   O := TC.Create();
-  RUN(O, SetF);
+  RUN(O, SetF);  
   G := O.F;
 end;
 

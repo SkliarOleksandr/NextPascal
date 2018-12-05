@@ -30,9 +30,6 @@ object frmCATMain: TfrmCATMain
     Color = clBtnShadow
     ParentColor = False
     ResizeStyle = rsUpdate
-    ExplicitLeft = 345
-    ExplicitTop = 0
-    ExplicitHeight = 693
   end
   object Panel1: TPanel
     Left = 0
@@ -70,7 +67,6 @@ object frmCATMain: TfrmCATMain
       OnDrawText = vtTestsDrawText
       OnFreeNode = vtTestsFreeNode
       OnGetText = vtTestsGetText
-      OnGetImageIndex = vtTestsGetImageIndex
       OnGetNodeDataSize = vtTestsGetNodeDataSize
       OnNodeDblClick = vtTestsNodeDblClick
       Columns = <
@@ -113,6 +109,14 @@ object frmCATMain: TfrmCATMain
         Font.Name = 'Courier New'
         Font.Style = []
         TabOrder = 0
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = False
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
         Gutter.Font.Height = -11
@@ -135,8 +139,6 @@ object frmCATMain: TfrmCATMain
         Color = clBtnShadow
         ParentColor = False
         ResizeStyle = rsUpdate
-        ExplicitTop = 428
-        ExplicitWidth = 594
       end
       object Splitter3: TSplitter
         Left = 403
@@ -147,9 +149,6 @@ object frmCATMain: TfrmCATMain
         Color = clBtnShadow
         ParentColor = False
         ResizeStyle = rsUpdate
-        ExplicitLeft = 632
-        ExplicitTop = 35
-        ExplicitHeight = 464
       end
       object edSource: TSynEdit
         Left = 0
@@ -164,6 +163,14 @@ object frmCATMain: TfrmCATMain
         Font.Style = []
         PopupMenu = pmSource
         TabOrder = 0
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = False
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
         Gutter.AutoSize = True
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
@@ -311,6 +318,14 @@ object frmCATMain: TfrmCATMain
         Font.Name = 'Courier New'
         Font.Style = []
         TabOrder = 2
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = False
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
         Gutter.Font.Charset = DEFAULT_CHARSET
         Gutter.Font.Color = clWindowText
         Gutter.Font.Height = -11
@@ -348,6 +363,14 @@ object frmCATMain: TfrmCATMain
             Font.Style = []
             PopupMenu = pmILCode
             TabOrder = 0
+            CodeFolding.GutterShapeSize = 11
+            CodeFolding.CollapsedLineColor = clGrayText
+            CodeFolding.FolderBarLinesColor = clGrayText
+            CodeFolding.IndentGuidesColor = clGray
+            CodeFolding.IndentGuides = True
+            CodeFolding.ShowCollapsedLine = False
+            CodeFolding.ShowHintMark = True
+            UseCodeFolding = False
             Gutter.AutoSize = True
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
@@ -380,6 +403,14 @@ object frmCATMain: TfrmCATMain
             Font.Style = []
             PopupMenu = pmVMCode
             TabOrder = 0
+            CodeFolding.GutterShapeSize = 11
+            CodeFolding.CollapsedLineColor = clGrayText
+            CodeFolding.FolderBarLinesColor = clGrayText
+            CodeFolding.IndentGuidesColor = clGray
+            CodeFolding.IndentGuides = True
+            CodeFolding.ShowCollapsedLine = False
+            CodeFolding.ShowHintMark = True
+            UseCodeFolding = False
             Gutter.AutoSize = True
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
@@ -410,6 +441,14 @@ object frmCATMain: TfrmCATMain
             Font.Name = 'Courier New'
             Font.Style = []
             TabOrder = 0
+            CodeFolding.GutterShapeSize = 11
+            CodeFolding.CollapsedLineColor = clGrayText
+            CodeFolding.FolderBarLinesColor = clGrayText
+            CodeFolding.IndentGuidesColor = clGray
+            CodeFolding.IndentGuides = True
+            CodeFolding.ShowCollapsedLine = False
+            CodeFolding.ShowHintMark = True
+            UseCodeFolding = False
             Gutter.AutoSize = True
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
@@ -439,6 +478,14 @@ object frmCATMain: TfrmCATMain
             Font.Name = 'Courier New'
             Font.Style = []
             TabOrder = 0
+            CodeFolding.GutterShapeSize = 11
+            CodeFolding.CollapsedLineColor = clGrayText
+            CodeFolding.FolderBarLinesColor = clGrayText
+            CodeFolding.IndentGuidesColor = clGray
+            CodeFolding.IndentGuides = True
+            CodeFolding.ShowCollapsedLine = False
+            CodeFolding.ShowHintMark = True
+            UseCodeFolding = False
             Gutter.AutoSize = True
             Gutter.Font.Charset = DEFAULT_CHARSET
             Gutter.Font.Color = clWindowText
@@ -462,10 +509,6 @@ object frmCATMain: TfrmCATMain
             Width = 391
             Height = 342
             Align = alClient
-            ExplicitLeft = 48
-            ExplicitTop = 88
-            ExplicitWidth = 105
-            ExplicitHeight = 105
           end
         end
       end
@@ -636,7 +679,7 @@ object frmCATMain: TfrmCATMain
     Left = 104
     Top = 384
     Bitmap = {
-      494C010107006001080210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107006001100210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

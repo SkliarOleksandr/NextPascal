@@ -251,6 +251,8 @@
             <Form>$R *.res</Form>
         </DCCReference>
         <DCCReference Include="..\ILTranslators\LLVM\dwsLLVM.pas"/>
+        <DCCReference Include="..\Compiler\NPCompiler.ExpressionContext.pas"/>
+        <DCCReference Include="..\Compiler\NPCompiler.Contexts.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
