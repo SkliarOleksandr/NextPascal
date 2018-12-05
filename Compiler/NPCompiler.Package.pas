@@ -3,7 +3,7 @@
 interface
 
 uses System.SysUtils, System.Classes, System.Types, Generics.Collections, System.IOUtils,
-     AVL, NPCompiler.DataTypes, NPCompiler.Classes, NPCompiler.Options,
+     AVL, NPCompiler.DataTypes, NPCompiler.Classes, NPCompiler.Options, NPLCompiler.Targets,
      NPCompiler.Intf, NPCompiler.Utils, NPCompiler, SystemUnit, NPCompiler.Evaluater;
 
 type
@@ -24,7 +24,8 @@ type
   private
     FName: string;
     FUnits: TUnits;
-    FTarget: string;
+    FTargetName: string;
+    FTarget: TNPLTarget;
     FDefines: TDefines;
     FStrLiterals: TStrLiterals;
     FIncludeDebugInfo: Boolean;
@@ -44,6 +45,8 @@ type
     function GetOptions: TPackageOptions;
     function GetTarget: string;
     function GetDefines: TDefines;
+    function GetPointerSize: Integer;
+    function GetNativeIntSize: Integer;
     procedure SetIncludeDebugInfo(const Value: Boolean);
     procedure SetRTTICharset(const Value: TRTTICharset);
     procedure SetTarget(const Value: string);
@@ -58,7 +61,7 @@ type
     procedure SaveStrLiterals(Stream: TStream);
     procedure AddUnit(aUnit, BeforeUnit: TObject); overload;
     procedure AddUnit(const Source: string); overload;
-    procedure AddUnitSearchPath(const Path: string);
+    procedure AddUnitSearchPath(const Path: string; IncludeSubDirectories: Boolean);
     procedure Clear;
     property IncludeDebugInfo: Boolean read GetIncludeDebugInfo write SetIncludeDebugInfo;
     property RTTICharset: TRTTICharset read GetRTTICharset write SetRTTICharset;
@@ -68,6 +71,7 @@ type
     function UsesUnit(const UnitName: string; AfterUnit: TObject): TObject;
     function GetMessages: ICompilerMessages;
     function Compile: TCompilerResult;
+    function CompileInterfacesOnly: TCompilerResult;
     property Evaluater: INPCEvaluater read FEvaluater write FEvaluater;
   end;
 
@@ -158,7 +162,7 @@ end;
 
 function TNPPackage.GetTarget: string;
 begin
-  Result := FTarget;
+  Result := FTargetName;
 end;
 
 function TNPPackage.GetUnit(Index: Integer): TObject;
@@ -286,6 +290,7 @@ begin
   FRTTICharset := RTTICharset;
   FStrLiterals := TStrLiterals.Create(StrListCompare);
   GetStringConstant(''); // занимаем нулевой индекс за пустой строкой
+  SetTarget('ANY');
 end;
 
 procedure TNPPackage.AddUnit(const Source: string);
@@ -296,9 +301,9 @@ begin
   AddUnit(UN, nil);
 end;
 
-procedure TNPPackage.AddUnitSearchPath(const Path: string);
+procedure TNPPackage.AddUnitSearchPath(const Path: string; IncludeSubDirectories: Boolean);
 begin
-  FUnitSearchPathes.Add(Path);
+  FUnitSearchPathes.AddObject(Path, TObject(IncludeSubDirectories));
 end;
 
 procedure TNPPackage.Clear;
@@ -386,11 +391,32 @@ begin
   Result := FRefCount;
 end;
 
-function TNPPackage.FindUnitFile(const UnitName: string): string;
+function FindInSubDirs(const RootDir, UnitName: string): string;
 var
-  i, j: Integer;
+  i: Integer;
   SearchPath, SearchUnitName: string;
   Dirs: TStringDynArray;
+begin
+  Dirs := TDirectory.GetDirectories(RootDir);
+  for i := 0 to Length(Dirs) - 1 do
+  begin
+    SearchPath := IncludeTrailingPathDelimiter(Dirs[i]);
+    SearchUnitName := SearchPath + UnitName + '.pas';
+    if FileExists(SearchUnitName) then
+      Exit(SearchUnitName);
+
+    Result := FindInSubDirs(SearchPath, UnitName);
+    if Result <> '' then
+      Exit;
+  end;
+  Result := '';
+end;
+
+function TNPPackage.FindUnitFile(const UnitName: string): string;
+var
+  i: Integer;
+  SearchPath, SearchUnitName: string;
+
 begin
   // поиск по файловой системе
   for i := 0 to FUnitSearchPathes.Count - 1 do
@@ -401,13 +427,11 @@ begin
       Exit(SearchUnitName);
 
     // поиск в поддиректориях
-    Dirs := TDirectory.GetDirectories(SearchPath);
-    for j := 0 to Length(Dirs) - 1 do
+    if Boolean(FUnitSearchPathes.Objects[i]) then
     begin
-      SearchPath := IncludeTrailingPathDelimiter(Dirs[j]);
-      SearchUnitName := SearchPath + UnitName + '.pas';
-      if FileExists(SearchUnitName) then
-        Exit(SearchUnitName);
+      Result := FindInSubDirs(SearchPath, UnitName);
+      if Result <> '' then
+        Exit;
     end;
   end;
   Result := '';
@@ -511,7 +535,34 @@ end;
 
 procedure TNPPackage.SetTarget(const Value: string);
 begin
-  FTarget := Value;
+  FTargetName := Value;
+  FTarget := FindTarget(Value);
+  if not Assigned(FTarget) then
+    AbortWorkInternal('Unknwon target: ' + Value);
+end;
+
+function TNPPackage.CompileInterfacesOnly: TCompilerResult;
+var
+  i: Integer;
+begin
+  Result := CompileSuccess;
+  // компиляция модулей
+  for i := 0 to FUnits.Count - 1 do
+  begin
+    Result := TNPUnit(FUnits[i]).CompileIntfOnly;
+    if Result = CompileFail then
+      Exit;
+  end;
+end;
+
+function TNPPackage.GetPointerSize: Integer;
+begin
+  Result := FTarget.PointerSize;
+end;
+
+function TNPPackage.GetNativeIntSize: Integer;
+begin
+  Result := FTarget.NativeIntSize;
 end;
 
 end.

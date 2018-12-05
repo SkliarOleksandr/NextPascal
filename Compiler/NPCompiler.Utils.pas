@@ -79,6 +79,23 @@ type
     procedure Add(const Item: T); inline;
   end;
 
+  TSimpleStack<T> = record
+  private
+    fItems: TArray<T>;
+    fCount: Integer;
+    fOnPopError: TProc;
+    function GetTop: T; inline;
+    procedure SetTop(const Value: T); inline;
+  public
+    constructor Create(Capacity: Integer);
+    procedure Push(const Value: T);
+    procedure Pop; inline;
+    property Count: Integer read fCount;
+    property Top: T read GetTop write SetTop;
+    property OnPopError: TProc read fOnPopError write fOnPopError;
+  end;
+
+
   TPooledObject = class
   private
     FPrevObect: TPooledObject;
@@ -1403,6 +1420,45 @@ begin
   if c1 <> c2 then
 end;
 
+
+{ TSimpleStack<T> }
+
+constructor TSimpleStack<T>.Create(Capacity: Integer);
+begin
+  SetLength(fItems, Capacity);
+end;
+
+procedure TSimpleStack<T>.Push(const Value: T);
+var
+  Len: Integer;
+begin
+  Len := Length(fItems);
+  if Len <= fCount then
+    SetLength(fItems, (Len + 1) * 2);
+
+  fItems[fCount] := Value;
+  Inc(fCount);
+end;
+
+procedure TSimpleStack<T>.Pop;
+begin
+  if fCount <= 0 then
+  begin
+    fOnPopError();
+    Exit;
+  end;
+  Dec(fCount);
+end;
+
+function TSimpleStack<T>.GetTop: T;
+begin
+  Result := fItems[fCount - 1];
+end;
+
+procedure TSimpleStack<T>.SetTop(const Value: T);
+begin
+  fItems[fCount - 1] := Value;
+end;
 
 initialization
   TPooledObject.Initialize;

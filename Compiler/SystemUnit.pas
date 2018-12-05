@@ -58,6 +58,7 @@ type
     FSysTStrDynArray: TIDDynArray;
     FSysTObjDynArray: TIDDynArray;
     FSysTVarDynArray: TIDDynArray;
+    fDeprecatedDefaultStr: TIDStringConstant;
     procedure AddImplicists;
     procedure AddExplicists;
     procedure AddNegOperators;
@@ -79,6 +80,8 @@ type
     function RegisterType(const TypeName: string; TypeClass: TIDTypeClass; DataType: TDataTypeID): TIDType;
     function RegisterRefType(const TypeName: string; TypeClass: TIDTypeClass; DataType: TDataTypeID): TIDType;
     function RegisterOrdinal(const TypeName: string; DataType: TDataTypeID; LowBound: Int64; HighBound: UInt64): TIDType;
+    function RegisterTypeAlias(const TypeName: string; OriginalType: TIDType): TIDAliasType;
+    function RegisterConstInt(const Name: string; DataType: TIDType; Value: Int64): TIDIntConstant;
   private
     procedure CreateCopyArrayOfObjProc;
     procedure CreateCopyArrayOfStrProc;
@@ -95,6 +98,7 @@ type
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     constructor Create(const Package: INPPackage; const Source: string); override;
     function Compile(RunPostCompile: Boolean = True): TCompilerResult; override;
+    function CompileIntfOnly: TCompilerResult; override;
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     procedure CreateSystemRoutins;
     property DataTypes: TDataTypes read FDataTypes;
@@ -146,6 +150,7 @@ type
     property _ExplicitEnumFromAny: TIDInternalOpImplicit read FExplicitEnumFromAny;
     property _AssertProc: TIDProcedure read FAsserProc;
     property _TypeID: TIDType read FTypeIDType;
+    property _DeprecatedDefaultStr: TIDStringConstant read fDeprecatedDefaultStr;
   end;
 
 var
@@ -916,6 +921,8 @@ begin
   // constant ""
   FEmptyStrConstant := TIDStringConstant.CreateAnonymous(IntfSection, _String, '');
   FEmptyStrExpression := TIDExpression.Create(FEmptyStrConstant);
+  // constant for deprecated
+  fDeprecatedDefaultStr := TIDStringConstant.CreateAsSystem(IntfSection, 'The declaration is deprecated');
 
   AddImplicists;
   AddExplicists;
@@ -1060,6 +1067,27 @@ procedure TSYSTEMUnit.InsertToScope(Declaration: TIDDeclaration);
 begin
   if Assigned(IntfSection.InsertNode(Declaration.Name, Declaration)) then
     raise Exception.CreateFmt('Unit SYSTEM: ' + msgIdentifierRedeclaredFmt, [Declaration.Name]);
+end;
+
+function TSYSTEMUnit.CompileIntfOnly: TCompilerResult;
+begin
+  Result := Compile();
+end;
+
+function TSYSTEMUnit.RegisterTypeAlias(const TypeName: string; OriginalType: TIDType): TIDAliasType;
+begin
+  Result := TIDAliasType.CreateAliasAsSystem(IntfSection, TypeName, OriginalType);
+  Result.Elementary := True;
+  InsertToScope(Result);
+  AddType(Result);
+end;
+
+function TSYSTEMUnit.RegisterConstInt(const Name: string; DataType: TIDType; Value: Int64): TIDIntConstant;
+begin
+  Result := TIDIntConstant.CreateAsSystem(IntfSection, Name);
+  Result.DataType := DataType;
+  Result.Value := Value;
+  InsertToScope(Result);
 end;
 
 initialization
