@@ -17,6 +17,7 @@ type
     ttToken,
     ttOmited,
     ttDigit,
+    ttCharCode,
     ttNewLine,
     ttHexPrefix,
     ttUnicodeChars,
@@ -31,8 +32,8 @@ type
   TIdentifierType = (
     itNone,
     itIdentifier, // named identifier like: 'a', 'value', 'width', etc.
-    itSymbol,     // value char symbol like: #10, , #32, etc.#13
     itChar,       // char symbol like: 'a', 'b', '1', etc.
+    itCharCodes,  // string like: #$D, #1234, #10#13, etc.
     itString,     // string like: 'abc', '111222333', etc.
     itInteger,    // integer number like: 12345, -4534534534, etc.
     itHextNumber, // hexadecimal number like: $FF, -$AABB, $12, etc.
@@ -121,6 +122,7 @@ type
     procedure ParseMultiLineRem(TokenID: Integer; var SPos: Integer);
     procedure ParseOneLineRem(var SPos: Integer);
     procedure ParseDidgit(SPos: Integer);
+    procedure ParseCharCode(SPos: Integer);
     procedure ParseQuote(Ch: Char; SPos: Integer);
     function ParseQuoteMulti(Ch: Char; SPos: Integer): Integer;
     procedure ParseUnicodeChars(SPos: Integer);
@@ -276,6 +278,7 @@ begin
         FSrcPos := SPos + 1;
         Result := Token.TokenID;
         FCurrentTokenID := Result;
+        {$IFDEF DEBUG} FCurrentToken := TokenLexem(Result); {$ENDIF}
         Exit;
       end;
       ttOmited: begin
@@ -289,6 +292,11 @@ begin
       end;
       ttDigit: begin
         ParseDidgit(SPos);
+        Result := FIdentifireID;
+        Exit;
+      end;
+      ttCharCode: begin
+        ParseCharCode(SPos);
         Result := FIdentifireID;
         Exit;
       end;
@@ -335,6 +343,7 @@ begin
           FSrcPos := SPos + 1;
         end;
         FCurrentTokenID := Result;
+        {$IFDEF DEBUG} FCurrentToken := TokenLexem(Result); {$ENDIF}
         Exit;
       end;
     end;
@@ -614,7 +623,7 @@ end;
 
 procedure TStringParser.RegisterRemToken(const BeginToken, EndToken: string; BeginTokenID, EndTokenID: Integer);
 begin
-  RegisterToken(BeginToken, BeginTokenID, ttStartRem);
+  RegisterToken(BeginToken, EndTokenID, ttStartRem);
   RegisterToken(EndToken, EndTokenID, ttEndRem);
 end;
 
@@ -781,6 +790,35 @@ begin
     Result := FCurrentToken
   else
     Result := TokenLexem(FCurrentTokenID);
+end;
+
+procedure TStringParser.ParseCharCode(SPos: Integer);
+type
+  TNumberSymbols = set of (nsExponent, nsPoint, nsSign);
+var
+  ReadedChars: integer;
+  Ch: Char;
+  NumberSymbols: TNumberSymbols;
+  CToken: PCharToken;
+begin
+  NumberSymbols := [];
+  ReadedChars := 0;
+  Inc(SPos);
+  Inc(ReadedChars);
+  while SPos <= FLength do
+  begin
+    Ch := Char(FUpCase[FSource[SPos]]);
+    CToken := addr(Tokens[Ch]);
+    if (CToken.TokenType <> ttCharCode) and
+       (CToken.TokenType <> ttDigit) then Break;
+    Inc(SPos);
+    Inc(ReadedChars);
+  end;
+  // read identifier:
+  FCurrentToken := Copy(FSource, SPos - ReadedChars, ReadedChars);
+  FIdentifireType := itCharCodes;
+  FCurrentTokenID := FIdentifireID;
+  FSrcPos := SPos;
 end;
 
 { TTextPosition }

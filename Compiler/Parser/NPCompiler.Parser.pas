@@ -249,7 +249,7 @@ begin
   TokenCaptions.AddObject('end of file', TObject(token_eof));
   TokenCaptions.AddObject('identifier', TObject(token_identifier));
   SeparatorChars := '#$ '''#9#10#13'%^&*@()+-{}[]\/,.;:<>=~!?';
-  RegisterToken('#', token_NumberSign, '', ttDigit);
+  RegisterToken('#', token_NumberSign, '', ttCharCode);
   RegisterToken('#define', token_cond_define);
   RegisterToken('#else', token_cond_else);
   RegisterToken('#end', token_cond_end);

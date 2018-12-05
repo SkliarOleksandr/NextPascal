@@ -4329,15 +4329,17 @@ end;
 function TNPUnit.CreateAnonymousConstant(Scope: TScope; var EContext: TEContext; const ID: TIdentifier;
                                          IdentifierType: TIdentifierType): TIDExpression;
 var
+  i: Integer;
   IntValue: Int64;
+  Int32Value: Int32;
   FltValue: Double;
   DataType: TIDType;
   Value: string;
   CItem: TIDConstant;
+  Chars: TStringDynArray;
 begin
   Value := ID.Name;
   case IdentifierType of
-    itSymbol: CItem := TIDCharConstant.CreateAnonymous(Scope, SYSUnit._Char, Value[1]); // !!!
     itChar: CItem := TIDCharConstant.CreateAnonymous(Scope, SYSUnit._Char, Value[1]);
     itString: begin
         // если чарсет метаданных равен ASCII, все строковые константы
@@ -4352,7 +4354,10 @@ begin
     itInteger: begin
       if Value[1] = '#' then begin
         Value := Copy(Value, 2, Length(Value) - 1);
-        CItem := TIDCharConstant.CreateAnonymous(Scope, SYSUnit._Char, Char(StrToInt(Value)));
+        if TryStrToInt(Value, Int32Value) then
+          CItem := TIDCharConstant.CreateAnonymous(Scope, SYSUnit._Char, Char(Int32Value))
+        else
+          AbortWorkInternal('int convert error', parser_Position);
       end else begin
         if not TryStrToInt64(Value, IntValue) then
         begin
@@ -4395,7 +4400,32 @@ begin
       DataType := SYSUnit.DataTypes[GetValueDataType(IntValue)];
       CItem := TIDIntConstant.CreateAnonymous(Scope, DataType, IntValue);
     end;
+    itCharCodes: begin
+      Chars := SplitString(ID.Name, '#');
+      if Chars[0] = '' then
+        Delete(Chars, 0, 1);
+      // this is a string
+      if Length(Chars) > 1 then
+      begin
+        SetLength(Value, Length(Chars));
+        for i := 0 to Length(Chars) - 1 do
+          Value[Low(string) + i] := Char(StrToInt(Chars[i]));
+
+        // если чарсет метаданных равен ASCII, все строковые константы
+        // удовлетворающе набору ASCII, создаются по умолчанию с типом AnsiString
+        if (FPackage.RTTICharset = RTTICharsetASCII) and IsAnsiString(Value) then
+          DataType := SYSUnit._AnsiString
+        else
+          DataType := SYSUnit._String;
+
+        CItem := TIDStringConstant.CreateAnonymous(Scope, DataType, Value);
+        CItem.Index := FPackage.GetStringConstant(TIDStringConstant(CItem));
+      end else
+      // this is a char
+        CItem := TIDCharConstant.CreateAnonymous(Scope, SYSUnit._Char, Char(StrToInt(Chars[0])));
+    end;
   else
+    ERROR_INTERNAL();
     CItem := nil;
   end;
   Result := TIDExpression.Create(CItem, ID.TextPosition);
