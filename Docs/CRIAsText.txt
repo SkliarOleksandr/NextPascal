@@ -1,0 +1,13 @@
+
+  fld1: int32 = 55;
+  fld2: int32 = 65;
+  fld3: float64 = 5.7;
+  [nodeB]
+    fld1: int32 = 55;
+    fld2: int32 = 65;
+    fld3: AnsiString = 'asdfghj';      
+  [];
+  fld4: table[col1: int32; col2: int32] =
+             (1, 'aaa'),
+             (2, 'bbb'),
+             (3, 'ccc');
