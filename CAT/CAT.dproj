@@ -253,6 +253,7 @@
         <DCCReference Include="..\ILTranslators\LLVM\dwsLLVM.pas"/>
         <DCCReference Include="..\Compiler\NPCompiler.ExpressionContext.pas"/>
         <DCCReference Include="..\Compiler\NPCompiler.Contexts.pas"/>
+        <DCCReference Include="..\Compiler\NPLCompiler.Targets.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
