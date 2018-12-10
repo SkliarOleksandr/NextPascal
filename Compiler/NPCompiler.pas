@@ -616,8 +616,10 @@ type
     class function CreateStructCopyProc(const Struct: TIDStructure): TIDProcedure;
     function CreateStructFinalProc(const Struct: TIDStructure): TIDProcedure;
     
-    {функция возвращает специальную анонимную переменную - результат булевых выражений}
-    class function GetBoolExprVar(var EContext: TEContext; Expr: TIDExpression {text position use only}): TIDExpression;
+    {функция возвращает специальную анонимную переменную - результат логических булевых выражений}
+    {такая переменная не используется для генерации IL кода, а используется лишь для определения типа выражения}
+    class function GetBoolResultExpr(ExistExpr: TIDExpression): TIDBoolResultExpression; overload; static; inline;
+    function GetBoolResultExpr(SContext: PSContext): TIDBoolResultExpression; overload; inline;
 
     {функция CheckImplicit проверяет, возможно ли неявное преобразование}
     class function CheckImplicit(Source: TIDExpression; Dest: TIDType): TIDDeclaration; static;
@@ -6133,7 +6135,7 @@ var
 begin
   parser_ReadNextIdentifier(Scope, ID);
 
-  if FPackage.Target = '' then
+  if (FPackage.Target = '') or (FPackage.Target = 'ANY') then
     FPackage.Target := ID.Name
   else
     AbortWork('Target is already defined as "%s"', [FPackage.Target], ID.TextPosition);
@@ -6227,7 +6229,7 @@ begin
   if Message.Row <=0 then
   begin
     Message.Row := parser_Position.Row;
-    Message.Row := parser_Position.Col;
+    Message.Col := parser_Position.Col;
   end;
   FMessages.Add(Message);
 end;
@@ -7032,7 +7034,7 @@ end;
 
 function TNPUnit.ParseStatements(Scope: TScope; SContext: PSContext; IsBlock: Boolean): TTokenID;
 var
-  EContext: TEContext;
+  EContext, REContext: TEContext;
   NewScope: TScope;
   Platform: TIDPlatform;
 begin
@@ -7113,10 +7115,13 @@ begin
         begin
           Result := ParseExpression(Scope, EContext, parser_CurTokenID);
           if Result = token_assign then begin
+            InitEContext(REContext, SContext, ExprRValue);
             Result := parser_NextToken(Scope);
-            EContext.EPosition := ExprRValue;
-            EContext.ResultExpression := nil;
-            Result := ParseExpression(Scope, EContext, Result);
+            Result := ParseExpression(Scope, REContext, Result);
+            if Assigned(REContext.LastBoolNode) then
+              Bool_CompleteImmediateExpression(REContext, REContext.Result);
+
+            RPNPushExpression(EContext, REContext.Result);
             RPNPushOperator(EContext, opAssignment);
             RPNFinish(EContext);
           end else
@@ -7169,7 +7174,7 @@ begin
   ThenSContext.Assign(SContext);
   ElseSContext.Assign(SContext);
   case Expression.ItemType of
-    itVar: if not (Expression.Declaration is TIDBoolVariable) then begin // Если if условие соотоит из одной boolean переменной
+    itVar: if not (Expression is TIDBoolResultExpression) then begin // Если if условие соотоит из одной boolean переменной
       ILWrite(SContext, TIL.IL_Test(Expression, Expression));
       ToElseJump := TIL.IL_JmpNext(Expression.Line, cZero, nil);
       ILWrite(SContext, ToElseJump);
@@ -7686,7 +7691,7 @@ begin
   NewSContext.Assign(SContext);
   NewSContext.LContext := LContext;
   case Expression.ItemType of
-    itVar: if not (Expression.Declaration is TIDBoolVariable) then
+    itVar: if not (Expression is TIDBoolResultExpression) then
     begin // Если if условие соотоит из одной boolean переменной
       ILWrite(SContext, TIL.IL_Test(Expression, Expression));
       ToEndJump := TIL.IL_JmpNext(Expression.Line, cZero, nil);
@@ -9901,7 +9906,7 @@ begin
   CheckBooleanExpression(Expression);
 
   case Expression.ItemType of
-    itVar: if not (Expression.Declaration is TIDBoolVariable) then
+    itVar: if not (Expression is TIDBoolResultExpression) then
     begin // Если if условие соотоит из одной boolean переменной
       ILWrite(@NewSContext, TIL.IL_Test(Expression, Expression));
       if Assigned(FirstLoopBodyCode) then
@@ -11491,7 +11496,7 @@ begin
   Expr := RPNPopExpression(EContext);
   CheckReferenceType(Expr);
 
-  Result := GetBoolExprVar(EContext, Expr);
+  Result := GetBoolResultExpr(SContext);
 
   Instruction := TIL.IL_Cmp(Expr, SYSUnit._NullPtrExpression);
   ILWrite(SContext, Instruction);
@@ -12991,7 +12996,7 @@ begin
           opLessOrEqual,
           opGreater,
           opGreaterOrEqual: begin
-            Result := GetBoolExprVar(EContext, Left);
+            Result := GetBoolResultExpr(Result);
             ILWrite(SContext, TIL.IL_Cmp(Left, Right));
             {освобожадем временные переменные}
             ReleaseExpression(SContext, Left);
@@ -13006,7 +13011,7 @@ begin
             begin
               // логические операции
               ReleaseExpression(Result);
-              Result := GetBoolExprVar(EContext, Left);
+              Result := GetBoolResultExpr(Left);
               Process_operator_logical_AND_OR(EContext, OpID, Left, Right, Result);
             end else begin
               // бинарные операции
@@ -13133,7 +13138,7 @@ begin
         end else begin
           // инвертируем условия сравнения
           InverseNode(EContext.LastBoolNode);
-          Result := GetBoolExprVar(EContext, Right);
+          Result := GetBoolResultExpr(Right);
         end;
       end;
     else
@@ -13358,13 +13363,17 @@ begin
    end;
 end;
 
-class function TNPUnit.GetBoolExprVar(var EContext: TEContext; Expr: TIDExpression {text position use only}): TIDExpression;
-var
-  Decl: TIDBoolVariable;
+class function TNPUnit.GetBoolResultExpr(ExistExpr: TIDExpression): TIDBoolResultExpression;
 begin
-  Decl := TIDBoolVariable.CreateAsTemporary(Expr.Declaration.Scope, SYSUnit._Boolean);
-  Decl.Node := EContext.LastBoolNode;
-  Result := TIDExpression.Create(Decl, Expr.TextPosition);
+  Result := TIDBoolResultExpression.Create(ExistExpr.Declaration, ExistExpr.TextPosition);
+end;
+
+function TNPUnit.GetBoolResultExpr(SContext: PSContext): TIDBoolResultExpression;
+var
+  Decl: TIDVariable;
+begin
+  Decl := SContext.GetTMPVar(SYSUnit._Boolean);
+  Result := TIDBoolResultExpression.Create(Decl, parser_Position);
 end;
 
 function TNPUnit.GetILText: string;

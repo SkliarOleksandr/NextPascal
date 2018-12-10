@@ -35,6 +35,13 @@ type
     class function NativeIntSize: Integer; override;
   end;
 
+  TJS_Target = class(TNPLAbstractTarget)
+  public
+    class function TargetName: string; override;
+    class function PointerSize: Integer; override;
+    class function NativeIntSize: Integer; override;
+  end;
+
   function FindTarget(const Name: string): TNPLTarget;
 
 implementation
@@ -107,12 +114,30 @@ end;
 
 class function TWINX64_Target.NativeIntSize: Integer;
 begin
-  Result := 8;
+  Result := NativeIntSize;
+end;
+
+{ TJS_Target }
+
+class function TJS_Target.TargetName: string;
+begin
+  Result := 'JS'
+end;
+
+class function TJS_Target.PointerSize: Integer;
+begin
+  Result := 4;
+end;
+
+class function TJS_Target.NativeIntSize: Integer;
+begin
+  Result := PointerSize;
 end;
 
 initialization
   RegisterTarget(TANY_Target);
   RegisterTarget(TWINX86_Target);
   RegisterTarget(TWINX64_Target);
+  RegisterTarget(TJS_Target);
 
 end.

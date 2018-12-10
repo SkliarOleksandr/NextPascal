@@ -30,8 +30,7 @@ type
     PrevNode: PBoolExprNode;         // Предыдущий нод (в стеке)
   end;
 
-
-  TExpessionPosition = (ExprRValue, ExprLValue, ExprNested, ExprNestedGeneric);
+  TExpessionPosition = (ExprNested, ExprLValue, ExprRValue, ExprNestedGeneric);
 
   {expression context - use RPN (Reverse Polish Notation) stack}
   TEContext = record
@@ -50,12 +49,11 @@ type
     fRPNLastOp: TOperatorID;
     fRPNPrevPriority: Integer;
     fProcessProc: TRPNPocessProc;
+    fPosition: TExpessionPosition;      // позиция выражения (Nested, LValue, RValue...);
     procedure RPNCheckInputSize;
     function GetExpression: TIDExpression;
   public
     SContext: PSContext;             // statement контекст
-    ResultExpression: TIDExpression; // результатурющее выражение контекста
-    EPosition: TExpessionPosition;   // позиция выражения (RValue, LValue);
     LastBoolNode: PBoolExprNode;     // содерижт Root узел boolean выражений
     LastInstruction: TILInstruction; // последняя инструкция на момент начала выражения
     procedure Initialize(const ProcessProc: TRPNPocessProc);
@@ -68,6 +66,7 @@ type
     property RPNExprCount: Integer read fRPNExprCount;
     property RPNLastOp: TOperatorID read fRPNLastOp;
     property Result: TIDExpression read GetExpression;
+    property EPosition: TExpessionPosition read fPosition write fPosition;
     function RPNPopOperator: TIDExpression;
     procedure RPNFinish;
     function RPNPushOperator(OpID: TOperatorID): TRPNStatus;
@@ -175,6 +174,8 @@ begin
     end else
       RPNError(reUnclosedOpenBracket);
   end;
+  if fPosition = ExprRValue then
+
 end;
 
 function TEContext.RPNPushOperator(OpID: TOperatorID): TRPNStatus;
@@ -242,7 +243,6 @@ begin
   fRPNExprCount := 0;
   fRPNLastOp := opNone;
   fRPNPrevPriority := 0;
-  ResultExpression := nil;
   LastBoolNode := nil;
   LastInstruction := nil;
   fProcessProc := ProcessProc;
