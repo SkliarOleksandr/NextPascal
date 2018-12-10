@@ -11443,17 +11443,30 @@ begin
     RNode := EContext.LastBoolNode;
   end;
 
-  // если правое выражение не было результатом сравнения
-  // до генерируем сравнение на True
   LNode := RNode.PrevNode;
+  // if LNode is not assigned, that because one of left or right expressions is simple bool variable
+  // and we need to generate TEST instruction for this variable:
   if not Assigned(LNode) then
   begin
-    Instruction := TIL.IL_Test(Right, Right);
-    ILWrite(SContext, Instruction);
-    ILWrite(SContext, TILJmpNext.Create(Instruction.Line));
-    Bool_AddExprNode(EContext, Instruction.Next, cNonZero);
-    LNode := RNode;
-    RNode := EContext.LastBoolNode;
+    // if Right expression is simple bool variabele:
+    if not (Right is TIDBoolResultExpression) then
+    begin
+      Instruction := TIL.IL_Test(Right, Right);
+      ILWrite(SContext, Instruction);
+      ILWrite(SContext, TILJmpNext.Create(Instruction.Line));
+      Bool_AddExprNode(EContext, Instruction.Next, cNonZero);
+      LNode := RNode;
+      RNode := EContext.LastBoolNode;
+    end else
+    // if Left expression is simple bool variabele:
+    if not (Left is TIDBoolResultExpression) then
+    begin
+      Instruction := TIL.IL_Test(Left, Left);
+      ILWrite(SContext, Instruction);
+      ILWrite(SContext, TILJmpNext.Create(Instruction.Line));
+      Bool_AddExprNode(EContext, Instruction.Next, cNonZero);
+      LNode := EContext.LastBoolNode;
+    end;
   end;
 
   // создаем новый нод для AND/OR операции
@@ -13011,7 +13024,7 @@ begin
             begin
               // логические операции
               ReleaseExpression(Result);
-              Result := GetBoolResultExpr(Left);
+              Result := GetBoolResultExpr(Result);
               Process_operator_logical_AND_OR(EContext, OpID, Left, Right, Result);
             end else begin
               // бинарные операции
@@ -13138,7 +13151,7 @@ begin
         end else begin
           // инвертируем условия сравнения
           InverseNode(EContext.LastBoolNode);
-          Result := GetBoolResultExpr(Right);
+          Result := GetBoolResultExpr(EContext.SContext);
         end;
       end;
     else

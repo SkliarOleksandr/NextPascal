@@ -10,16 +10,20 @@ begin
 end; 
 
 var
-  R: Boolean;
+  A: Boolean = True;
+  R1, R2, B: Boolean = False;
 
 procedure Test; 
 begin
-  R := GetBool(True) and not GetBool(False);
+  R1 := A and (not B);
+  R2 := (not B) and A;  
 end;
 
 initialization
   Test();
 
 finalization
-  Assert(R);
+  Assert(R1);
+  Assert(R2);  
+ 
 end.
