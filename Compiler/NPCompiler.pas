@@ -11456,9 +11456,10 @@ begin
     // if left expression is simple bool variable:
     if not (Left is TIDBoolResultExpression) then
     begin
+      LeftLastCode := TILInstruction(Left.Instruction);
       Instruction := TIL.IL_Test(Left, Left);
-      ILWrite(SContext, Instruction);
-      ILWrite(SContext, TILJmpNext.Create(Instruction.Line));
+      SContext.IL.InsertAfter(LeftLastCode, Instruction);
+      SContext.IL.InsertAfter(Instruction, TILJmpNext.Create(Instruction.Line));
       Bool_AddExprNode(EContext, Instruction.Next, cNonZero);
       LNode := EContext.LastBoolNode;
     end;
