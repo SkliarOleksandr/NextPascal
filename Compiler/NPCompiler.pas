@@ -119,14 +119,9 @@ type
   ////////////////////////////////////////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////////////////////////////////////
     procedure RPNPushExpression(var EContext: TEContext; Operand: TIDExpression); inline;
-    procedure RPNPushOpenRaund(var EContext: TEContext); inline;
-    procedure RPNPushCloseRaund(var EContext: TEContext);
-    function RPNPopOperator(var EContext: TEContext): TIDExpression;
-    procedure RPNFinish(var EContext: TEContext);
-    function RPNPushOperator(var EContext: TEContext; OpID: TOperatorID): TEContext.TRPNStatus; overload;
-    function RPNReadExpression(var EContext: TEContext; Index: Integer): TIDExpression; overload;
-  public
-    function RPNPopExpression(var EContext: TEContext): TIDExpression; overload;
+    function RPNPushOperator(var EContext: TEContext; OpID: TOperatorID): TEContext.TRPNStatus; inline;
+    function RPNReadExpression(var EContext: TEContext; Index: Integer): TIDExpression; inline;
+    function RPNPopExpression(var EContext: TEContext): TIDExpression; inline;
   private
     FID: Integer;                      // ID модуля в пакете
     FPackage: INPPackage;
@@ -5266,7 +5261,7 @@ begin
           // если выражение продолжается дальше, генерируем вызов процедуры
           if Result in [token_dot, token_openblock] then
           begin
-            Expression := RPNPopOperator(EContext);
+            Expression := EContext.RPNPopOperator();
             Decl := Expression.Declaration;
             PMContext.Clear;
           end else begin
@@ -5894,7 +5889,7 @@ begin
     end;
 
     RPNPushOperator(EContext, opAssignment);
-    RPNFinish(EContext);
+    EContext.RPNFinish;
 
     parser_MatchSemicolon(Result);
     break;
@@ -6397,7 +6392,7 @@ begin
       token_eof: Break;// ERROR_END_OF_FILE;
       token_openround: begin
         Inc(RoundCount);
-        RPNPushOpenRaund(EContext);
+        EContext.RPNPushOpenRaund();
         Status := rprOk;
       end;
       token_closeround: begin
@@ -6409,7 +6404,7 @@ begin
 
           ERROR_UNNECESSARY_CLOSED_ROUND;
         end;
-        RPNPushCloseRaund(EContext);
+        EContext.RPNPushCloseRaund();
         Status := rpOperand;
       end;
       token_iif: begin
@@ -6623,7 +6618,7 @@ begin
   if (EContext.EPosition <> ExprNested) and (Status <> rpOperand) and NeedRValue(EContext.RPNLastOp) then
     ERROR_EXPRESSION_EXPECTED;
 
-  RPNFinish(EContext);
+  EContext.RPNFinish();
 end;
 
 function TNPUnit.ParseStaticArrayType(Scope: TScope; Decl: TIDArray): TTokenID;
@@ -7123,7 +7118,7 @@ begin
 
             RPNPushExpression(EContext, REContext.Result);
             RPNPushOperator(EContext, opAssignment);
-            RPNFinish(EContext);
+            EContext.RPNFinish();
           end else
           if Result = token_coma then begin
             parser_NextToken(Scope);
@@ -7492,7 +7487,7 @@ begin
 
   // пишем инструкцию присваениея начального значения
   RPNPushOperator(EContext, opAssignment);
-  RPNFinish(EContext);
+  EContext.RPNFinish();
 
   // устанавливаем флаг цикловой переменной
   with TIDVariable(LoopVar) do Flags := Flags + [VarLoopIndex];
@@ -8300,7 +8295,7 @@ begin
     Result := ParseExpression(Scope, EContext, parser_NextToken(Scope));
     parser_MatchToken(Result, token_closeround);
     RPNPushOperator(EContext, opAssignment);
-    RPNFinish(EContext);
+    EContext.RPNFinish();
     Result := parser_NextToken(Scope);
   end;
   {проверка на выход из try... секции}
@@ -11448,7 +11443,7 @@ begin
   // and we need to generate TEST instruction for this variable:
   if not Assigned(LNode) then
   begin
-    // if Right expression is simple bool variabele:
+    // if right expression is simple bool variable:
     if not (Right is TIDBoolResultExpression) then
     begin
       Instruction := TIL.IL_Test(Right, Right);
@@ -11458,7 +11453,7 @@ begin
       LNode := RNode;
       RNode := EContext.LastBoolNode;
     end else
-    // if Left expression is simple bool variabele:
+    // if left expression is simple bool variable:
     if not (Left is TIDBoolResultExpression) then
     begin
       Instruction := TIL.IL_Test(Left, Left);
@@ -13542,29 +13537,9 @@ begin
     Result := ParseCondStatements(Scope, Result);
 end;
 
-procedure TNPUnit.RPNFinish(var EContext: TEContext);
-begin
-  EContext.RPNFinish();
-end;
-
 function TNPUnit.RPNPushOperator(var EContext: TEContext; OpID: TOperatorID): TEContext.TRPNStatus;
 begin
   Result := EContext.RPNPushOperator(OpID);
-end;
-
-function TNPUnit.RPNPopOperator(var EContext: TEContext): TIDExpression;
-begin
-  Result := EContext.RPNPopOperator();
-end;
-
-procedure TNPUnit.RPNPushCloseRaund(var EContext: TEContext);
-begin
-  EContext.RPNPushCloseRaund();
-end;
-
-procedure TNPUnit.RPNPushOpenRaund(var EContext: TEContext);
-begin
-  EContext.RPNPushOpenRaund();
 end;
 
 procedure TNPUnit.RPNPushExpression(var EContext: TEContext; Operand: TIDExpression);

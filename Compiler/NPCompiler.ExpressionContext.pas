@@ -57,18 +57,18 @@ type
     LastBoolNode: PBoolExprNode;     // содерижт Root узел boolean выражений
     LastInstruction: TILInstruction; // последн€€ инструкци€ на момент начала выражени€
     procedure Initialize(const ProcessProc: TRPNPocessProc);
+    procedure Reset;                 // clear RPN stack and reinit
     procedure RPNPushExpression(Expr: TIDExpression);
     procedure RPNError(Status: TRPNError);
     procedure RPNPushOpenRaund;
     procedure RPNPushCloseRaund;
     procedure RPNEraiseTopOperator;
-    procedure Reset;
+    procedure RPNFinish;
     property RPNExprCount: Integer read fRPNExprCount;
     property RPNLastOp: TOperatorID read fRPNLastOp;
     property Result: TIDExpression read GetExpression;
     property EPosition: TExpessionPosition read fPosition write fPosition;
     function RPNPopOperator: TIDExpression;
-    procedure RPNFinish;
     function RPNPushOperator(OpID: TOperatorID): TRPNStatus;
     function RPNReadExpression(Index: Integer): TIDExpression; inline;
     function RPNLastOperator: TOperatorID;
@@ -174,8 +174,6 @@ begin
     end else
       RPNError(reUnclosedOpenBracket);
   end;
-  if fPosition = ExprRValue then
-
 end;
 
 function TEContext.RPNPushOperator(OpID: TOperatorID): TRPNStatus;

@@ -41,7 +41,7 @@ var
 begin
   UN := GetUnit(EContext);
   // ÷èòàåì àðãóìåíò
-  Expr := UN.RPNPopExpression(EContext);
+  Expr := EContext.RPNPopExpression();
   Decl := Expr.Declaration;
 
   case Decl.ItemType of
@@ -74,8 +74,8 @@ var
   TextExpr, Expr: TIDExpression;
 begin
   // читаем второй аргумент
-  TextExpr := Ctx.UN.RPNPopExpression(Ctx.EContext^);
-  Expr := Ctx.UN.RPNPopExpression(Ctx.EContext^);
+  TextExpr := Ctx.EContext.RPNPopExpression();
+  Expr := Ctx.EContext.RPNPopExpression();
   Ctx.UN.CheckConstExpression(Expr);
   if not Expr.AsBoolConst.Value then
   begin
