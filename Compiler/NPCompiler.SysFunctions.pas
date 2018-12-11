@@ -6,13 +6,13 @@ uses NPCompiler, NPCompiler.Classes, NPCompiler.DataTypes, NPCompiler.Errors, Sy
   NPCompiler.Contexts, NPCompiler.ExpressionContext;
 
 type
-  {ôóíêöèÿ: typeid}
+  {function: typeid}
   TSF_typeid = class(TIDSysRuntimeFunction)
   protected
     function Process(var EContext: TEContext): TIDExpression; override;
   end;
 
-  {ôóíêöèÿ: now}
+  {function: now}
   TSF_now = class(TIDSysRuntimeFunction)
   protected
     function Process(var EContext: TEContext): TIDExpression; override;
@@ -24,7 +24,11 @@ type
     function Process(const Ctx: TSysFunctionContext): TIDExpression; override;
   end;
 
-
+  {function: Defined}
+  TSCTF_Defined = class(TIDSysCompileFunction)
+  protected
+    function Process(const Ctx: TSysFunctionContext): TIDExpression; override;
+  end;
 
 implementation
 
@@ -85,6 +89,23 @@ begin
       AbortWork('Static assertion. Message: "' + TextExpr.AsStrConst.Value + '"', Expr.TextPosition);
   end;
   Result := nil;
+end;
+
+{ TSCTF_Defined }
+
+function TSCTF_Defined.Process(const Ctx: TSysFunctionContext): TIDExpression;
+var
+  Expr: TIDExpression;
+begin
+  Expr := Ctx.EContext.RPNPopExpression();
+
+  if Expr.DataTypeID <> dtString then
+    AbortWork('DEFINE String expected', Expr.TextPosition);
+
+  if Ctx.UN.Defined(Expr.AsStrConst.Value) then
+    Result := SYSUnit._TrueExpression
+  else
+    Result := SYSUnit._FalseExpression;
 end;
 
 end.

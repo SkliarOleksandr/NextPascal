@@ -317,10 +317,10 @@ initialization
   _operators.AddObject('In', TObject(opIn));
   _operators.AddObject('Equal', TObject(opEqual));
   _operators.AddObject('NotEqual', TObject(opNotEqual));
-  _operators.AddObject('Greater', TObject(opGreater));
-  _operators.AddObject('GreaterOrEqual', TObject(opGreaterOrEqual));
-  _operators.AddObject('Less', TObject(opLess));
-  _operators.AddObject('LessOrEqual', TObject(opLessOrEqual));
+  _operators.AddObject('GreaterThan', TObject(opGreater));
+  _operators.AddObject('GreaterThanOrEqual', TObject(opGreaterOrEqual));
+  _operators.AddObject('LessThan', TObject(opLess));
+  _operators.AddObject('LessThanOrEqual', TObject(opLessOrEqual));
   _operators.AddObject('Add', TObject(opAdd));
   _operators.AddObject('Subtract', TObject(opSubtract));
   _operators.AddObject('Multiply', TObject(opMultiply));
