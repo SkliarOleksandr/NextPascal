@@ -124,7 +124,7 @@ const
   {opPositive}             2,
   {opPostInc}              7,
   {opPostDec}              7,
-  {opLogicalNot}           1,
+  {opLogicalNot}           8,
 
   {opIn}                   1,
   {opEqual}                5,

@@ -186,16 +186,21 @@ begin
 
   fRPNLastOp := OpID;
   Priority := cOperatorPriorities[OpID];
-  if (Priority <= fRPNPrevPriority) then begin
-    while fRPNOpCount > 0 do begin
-      Op := fRPNOArray[fRPNOpCount - 1];
-      if (cOperatorPriorities[Op] >= Priority) and (Op <> opOpenRound) then
-      begin
-        Dec(fRPNOpCount);
-        fRPNEArray[fRPNExprCount] := fProcessProc(Self, Op);
-        Inc(fRPNExprCount);
-      end else
-        Break;
+
+  if cOperatorTypes[OpID] <> opUnarPrefix then
+  begin
+    if (Priority <= fRPNPrevPriority) then
+    begin
+      while fRPNOpCount > 0 do begin
+        Op := fRPNOArray[fRPNOpCount - 1];
+        if (cOperatorPriorities[Op] >= Priority) and (Op <> opOpenRound) then
+        begin
+          Dec(fRPNOpCount);
+          fRPNEArray[fRPNExprCount] := fProcessProc(Self, Op);
+          Inc(fRPNExprCount);
+        end else
+          Break;
+      end;
     end;
   end;
 
