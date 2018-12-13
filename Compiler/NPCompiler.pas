@@ -11072,17 +11072,25 @@ begin
       Struct.Members.ProcSpace.Add(Proc);
     end;
 
-    if OperatorID = opImplicit then
-    begin
-      if ResultType = Struct then
-        Struct.OverloadImplicitFrom(Parameters.VarSpace.Last.DataType, Proc)
-      else
-        Struct.OverloadImplicitTo(ResultType, Proc);
-    end else
-    if OperatorID < opIn then
-      Struct.OverloadUnarOperator(OperatorID, Proc)
+    case OperatorID of
+      opImplicit: begin
+        if ResultType = Struct then
+          Struct.OverloadImplicitFrom(Parameters.VarSpace.Last.DataType, Proc)
+        else
+          Struct.OverloadImplicitTo(ResultType, Proc);
+      end;
+      opExplicit: begin
+        if ResultType = Struct then
+          Struct.OverloadExplicitFrom(Parameters.VarSpace.Last.DataType{, Proc})
+        else
+          Struct.OverloadExplicitTo(ResultType{, Proc});
+      end;
     else
-      Struct.OverloadBinarOperator(OperatorID, TIDOperator(Proc));
+      if OperatorID < opIn then
+        Struct.OverloadUnarOperator(OperatorID, Proc)
+      else
+        Struct.OverloadBinarOperator(OperatorID, TIDOperator(Proc));
+    end;
 
   end else begin
     if Assigned(Proc.GenericDescriptor) then
@@ -11113,9 +11121,7 @@ begin
       Proc.EntryScope := Parameters;
       if (FwdDeclState = dsDifferent) then
       begin
-        if Assigned(Proc.IL) then
-          ERROR_OVERLOADED_MUST_BE_MARKED(ID)
-        else
+        if not Assigned(Proc.IL) then
           ERROR_DECL_DIFF_WITH_PREV_DECL(ID);
       end;
       Result := ParseProcBody(Proc, nil);
@@ -11129,8 +11135,8 @@ begin
       ERROR_PROC_NEED_BODY;
     Break;}
   end;
-  if (FwdDeclState = dsDifferent) and not (pfOveload in Proc.Flags) then
-    ERROR_OVERLOADED_MUST_BE_MARKED(ID);
+  // if (FwdDeclState = dsDifferent) and not (pfOveload in Proc.Flags) then
+  //   ERROR_OVERLOADED_MUST_BE_MARKED(ID);
 end;
 
 function TNPUnit.ParseUnionSection(Scope: TScope; Struct: TIDStructure): TTokenID;
