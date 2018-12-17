@@ -6,7 +6,8 @@ implementation
 
 type
   TRec = record
-    Value: Int32;
+    VL: string; 
+    VH: Int32;    
     operator Explicit(const a: TRec): Int32; 
     operator Explicit(const a: Int32): TRec;      
   end;
@@ -18,12 +19,12 @@ var
 
 operator TRec.Explicit(const a: TRec): Int32;
 begin
-  Result := A.Value;
+  Result := A.VH;
 end;
 
 operator TRec.Explicit(const a: Int32): TRec; 
 begin
-  Result.Value := A;
+  Result.VH := A;
 end;
 
 procedure Test;
@@ -39,5 +40,5 @@ initialization
 finalization
   Assert(V1 = 42);
   Assert(V2 = 42);
-  Assert(R.Value = 42);    
+  Assert(R.VH = 42);    
 end.

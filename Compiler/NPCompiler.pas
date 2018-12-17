@@ -645,7 +645,7 @@ type
     { функция проверяет возможно ли приведение кортежа к битовому набору }
     class function CheckSetImplicit(Source: TIDExpression; Destination: TIDSet): TIDDeclaration; static;
 
-    class function MatchExplicit(const Source: TIDExpression; Destination: TIDType): TIDType; static; inline;
+    class function MatchExplicit(const Source: TIDExpression; Destination: TIDType): TIDDeclaration; static; inline;
     class function MatchConstDynArrayImplicit(Source: TIDExpression; Destination: TIDType): TIDType; static;
     class function MatchDynArrayImplicit(Source: TIDExpression; Destination: TIDType): TIDType; static;
     class function MatchProcedureTypes(Src: TIDProcType; Dst: TIDProcType): TIDType; static;
@@ -2658,7 +2658,7 @@ begin
   Result := nil;
 end;
 
-class function TNPUnit.MatchExplicit(const Source: TIDExpression; Destination: TIDType): TIDType;
+class function TNPUnit.MatchExplicit(const Source: TIDExpression; Destination: TIDType): TIDDeclaration;
 var
   SrcDataType: TIDType;
   DstDataType: TIDType;
@@ -11081,9 +11081,9 @@ begin
       end;
       opExplicit: begin
         if ResultType = Struct then
-          Struct.OverloadExplicitFrom(Parameters.VarSpace.Last.DataType{, Proc})
+          Struct.OverloadExplicitFrom(Parameters.VarSpace.Last.DataType, Proc)
         else
-          Struct.OverloadExplicitTo(ResultType{, Proc});
+          Struct.OverloadExplicitTo(ResultType, Proc);
       end;
     else
       if OperatorID < opIn then
@@ -12684,7 +12684,7 @@ function TNPUnit.ParseExplicitCast(Scope: TScope; SContext: PSContext; var DstEx
 var
   EContext: TEContext;
   SrcExpr: TIDExpression;
-  OperatorDecl: TIDType;
+  OperatorDecl: TIDDeclaration;
   CallExpr: TIDCallExpression;
   TargetType: TIDType;
 begin
@@ -12738,7 +12738,7 @@ begin
   begin
     if (SrcExpr.ItemType = itConst) and (SrcExpr.IsAnonymous) then
     begin
-      TIDConstant(SrcExpr.Declaration).ExplicitDataType := OperatorDecl;
+      TIDConstant(SrcExpr.Declaration).ExplicitDataType := OperatorDecl as TIDType;
       DstExpression := TIDExpression.Create(SrcExpr.Declaration);
     end else
       DstExpression := TIDCastExpression.Create(SrcExpr.Declaration, TIDType(DstExpression.Declaration), DstExpression.TextPosition);

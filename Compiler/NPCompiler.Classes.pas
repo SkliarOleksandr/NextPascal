@@ -391,8 +391,8 @@ type
     function FindImplicitOperatorTo(const Destination: TIDType): TIDDeclaration;
     function FindImplicitOperatorFrom(const Source: TIDType): TIDDeclaration;
 
-    function GetExplicitOperatorTo(const Destination: TIDType): TIDType;
-    function GetExplicitOperatorFrom(const Source: TIDType): TIDType;
+    function GetExplicitOperatorTo(const Destination: TIDType): TIDDeclaration;
+    function GetExplicitOperatorFrom(const Source: TIDType): TIDDeclaration;
 
     function UnarOperator(Op: TOperatorID; Right: TIDType): TIDType; overload; inline;
     function BinarOperator(Op: TOperatorID; Right: TIDType): TIDType; inline;
@@ -414,8 +414,11 @@ type
     procedure OverloadImplicitFrom(const Source: TIDDeclaration); overload;
     procedure OverloadImplicitFrom(const Source, Proc: TIDDeclaration); overload;
 
-    procedure OverloadExplicitTo(const Destination: TIDDeclaration);
-    procedure OverloadExplicitFrom(const Source: TIDDeclaration);
+    procedure OverloadExplicitTo(const Destination: TIDDeclaration); overload;
+    procedure OverloadExplicitTo(const Destination, Proc: TIDDeclaration); overload;
+    procedure OverloadExplicitFrom(const Source: TIDDeclaration); overload;
+    procedure OverloadExplicitFrom(const Source, Proc: TIDDeclaration); overload;
+
     procedure OverloadExplicitToEny(const Op: TIDOperator);
     procedure OverloadExplicitFromEny(const Op: TIDOperator);
 
@@ -2767,7 +2770,7 @@ begin
   inherited;
 end;
 
-function TIDType.GetExplicitOperatorFrom(const Source: TIDType): TIDType;
+function TIDType.GetExplicitOperatorFrom(const Source: TIDType): TIDDeclaration;
 var
   Node: TIDPairList.PAVLNode;
 begin
@@ -2775,18 +2778,18 @@ begin
   begin
     Node := FExplicitsFrom.Find(Source);
     if Assigned(Node) then
-      Exit(Source);
+      Exit(TIDDeclaration(Node.Data));
   end;
   Result := nil;
 end;
 
-function TIDType.GetExplicitOperatorTo(const Destination: TIDType): TIDType;
+function TIDType.GetExplicitOperatorTo(const Destination: TIDType): TIDDeclaration;
 var
   Node: TIDPairList.PAVLNode;
 begin
   Node := FExplicitsTo.Find(Destination);
   if Assigned(Node) then
-    Exit(Destination);
+    Exit(TIDDeclaration(Node.Data));
   Result := nil;
 end;
 
@@ -3081,6 +3084,12 @@ begin
     ERROR_OPERATOR_ALREADY_OVERLOADED(opExplicit, Self, Destination, TextPosition);
 end;
 
+procedure TIDType.OverloadExplicitTo(const Destination, Proc: TIDDeclaration);
+begin
+  if Assigned(FExplicitsTo.InsertNode(Destination, Proc)) then
+    ERROR_OPERATOR_ALREADY_OVERLOADED(opExplicit, Self, Proc, TextPosition);
+end;
+
 procedure TIDType.OverloadExplicitFrom(const Source: TIDDeclaration);
 begin
   if not Assigned(FExplicitsFrom) then
@@ -3088,6 +3097,15 @@ begin
 
   if Assigned(FExplicitsFrom.InsertNode(Source, Source)) then
     ERROR_OPERATOR_ALREADY_OVERLOADED(opExplicit, Self, Source, TextPosition);
+end;
+
+procedure TIDType.OverloadExplicitFrom(const Source, Proc: TIDDeclaration);
+begin
+  if not Assigned(FExplicitsFrom) then
+    FExplicitsFrom := TIDPairList.Create;
+
+  if Assigned(FExplicitsFrom.InsertNode(Source, Proc)) then
+    ERROR_OPERATOR_ALREADY_OVERLOADED(opExplicit, Source, Proc, TextPosition);
 end;
 
 procedure TIDType.OverloadExplicitFromEny(const Op: TIDOperator);
