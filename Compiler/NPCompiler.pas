@@ -151,6 +151,8 @@ type
     FOptions: TCompilerOptions;
     FBreakPoints: TBreakPoints;
     FUseCheckBound: Boolean;
+    fInitProcSConect: TSContext;
+    fFinalProcSConect: TSContext;
     function GetMessagesText: string;
     //========================================================================================================
     // процедуры генерации ошибок компиляции
@@ -4459,11 +4461,17 @@ begin
   FInitProc := TIDProcedure.CreateAsSystem(Scope, '$initialization');
   FInitProc.EntryScope := Scope;
   FInitProc.IL := TIL.Create(FInitProc);
+  fInitProcSConect.Proc := FInitProc;
+  fInitProcSConect.IL := TIL(FInitProc.IL);
+  fInitProcSConect.WriteIL := True;
 
   Scope := TProcScope.CreateInBody(FImplScope);
   FFinalProc := TIDProcedure.CreateAsSystem(Scope, '$finalization');
   FFinalProc.EntryScope := Scope;
   FFinalProc.IL := TIL.Create(FFinalProc);
+  fFinalProcSConect.Proc := FInitProc;
+  fFinalProcSConect.IL := TIL(FInitProc.IL);
+  fFinalProcSConect.WriteIL := True;
 
   FBreakPoints := TBreakPoints.Create;
   fCondStack := TSimpleStack<Boolean>.Create(0);
@@ -9719,21 +9727,30 @@ end;
 
 function TNPUnit.ParseVarDefaultValue(Scope: TScope; DataType: TIDType; out DefaultValue: TIDExpression): TTokenID;
 var
-  SContext: TSContext;
+  SContext: PSContext;
+  EContext: TEContext;
 begin
   if DataType.DataTypeID = dtStaticArray then
     Result := ParseVarStaticArrayDefaultValue(Scope, DataType as TIDArray, DefaultValue)
   else begin
-    Result := ParseConstExpression(Scope, DefaultValue, parser_NextToken(Scope), ExprNested);
+
+    SContext := @fInitProcSConect;
+
+    Result := parser_NextToken(Scope);
+
+    if Scope.ScopeType = stLocal then
+      Result := ParseConstExpression(Scope, DefaultValue, Result, ExprRValue)
+    else begin
+      InitEContext(EContext, SContext, ExprRValue);
+      Result := ParseExpression(Scope, EContext, Result);
+      DefaultValue := EContext.Result;
+    end;
     CheckEmptyExpression(DefaultValue);
+
     if CheckImplicit(DefaultValue, DataType) = nil then
       ERROR_INCOMPATIBLE_TYPES(DefaultValue, DataType);
 
-    SContext.Initialize;
-    SContext.WriteIL := False;
-    SContext.Proc := FInitProc;
-
-    DefaultValue := MatchImplicit3(@SContext, DefaultValue, DataType);
+    DefaultValue := MatchImplicit3(SContext, DefaultValue, DataType);
 
     if DefaultValue.IsAnonymous then
       DefaultValue.Declaration.DataType := DataType; // подгоняем фактичиский тип константы под необходимый
@@ -9820,7 +9837,14 @@ begin
         DataType := GetWeakRefType(Scope, DataType);
       Field.DataType := DataType;
       Field.Visibility := Visibility;
-      Field.DefaultValue := DefaultValue;
+
+      // if the init value for global var is not constant value
+      if Assigned(DefaultValue) and DefaultValue.IsTMPVar then
+      begin
+        ILWrite(@fInitProcSConect, TIL.IL_Move(TIDExpression.Create(Field), DefaultValue));
+      end else
+        Field.DefaultValue := DefaultValue;
+
       Field.Absolute := TIDVariable(DeclAbsolute);
       Field.Flags := Field.Flags + VarFlags;
       if isRef then
@@ -11135,8 +11159,6 @@ begin
       ERROR_PROC_NEED_BODY;
     Break;}
   end;
-  // if (FwdDeclState = dsDifferent) and not (pfOveload in Proc.Flags) then
-  //   ERROR_OVERLOADED_MUST_BE_MARKED(ID);
 end;
 
 function TNPUnit.ParseUnionSection(Scope: TScope; Struct: TIDStructure): TTokenID;
