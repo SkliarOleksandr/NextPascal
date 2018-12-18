@@ -665,6 +665,7 @@ type
     procedure Read_MEMSET(var Ctx: TILTContext);
     procedure Read_INHT_CALL(var Ctx: TILTContext);
     procedure Read_PCALL(var Ctx: TILTContext);
+    procedure Read_PCALL_UNSAFE(var Ctx: TILTContext);
     procedure Read_CHKBND(var Ctx: TILTContext);
     procedure Read_MEMGET(var Ctx: TILTContext);
     procedure Read_MEMFREE(var Ctx: TILTContext);
@@ -2614,6 +2615,7 @@ begin
         icEThrow: Read_ETHROW(Context);
         icInhtCall: Read_INHT_CALL(Context);
         icProcCall, icVirtCall: Read_PCALL(Context);
+        icUSafeCall: Read_PCALL_UNSAFE(Context);
         icInit: Read_INIT(Context);
         icIncRef: Read_INCREF(Context);
         icDecRef: Read_DECREF(Context);
@@ -2707,6 +2709,7 @@ begin
         icEThrow: Translate_ETHROW(Context, TIL_ETHROW_ARGS(Context.Args));
         icInhtCall: Translate_PCALL(Context, TIL_PCALL_ARGS(Context.Args));
         icProcCall, icVirtCall: Translate_PCALL(Context, TIL_PCALL_ARGS(Context.Args));
+        icUSafeCall: Translate_PCALL(Context, TIL_PCALL_ARGS(Context.Args));
         icInit: Translate_INIT(Context, TIL_INIT_ARGS(Context.Args));
         icIncRef: Translate_INCREF(Context, TIL_INCREF_ARGS(Context.Args));
         icDecRef: Translate_DECREF(Context, TIL_DECREF_ARGS(Context.Args));
@@ -3600,6 +3603,28 @@ begin
     Args.PArg := PArg.Next
   else
     Args.PArg := PArg;
+
+  // читаем аргументы вызова
+  cnt := Ctx.Stream.ReadStretchUInt;
+  SetLength(Args.CallArgs, cnt);
+  for i := 0 to cnt - 1 do
+    LoadILArgument(Ctx, Args.CallArgs[i]);
+
+  Ctx.Args := Args;
+end;
+
+procedure TILTranslator.Read_PCALL_UNSAFE(var Ctx: TILTContext);
+var
+  Args: TIL_PCALL_ARGS;
+  i, cnt: Integer;
+  PArg, TArg: TILArgument;
+begin
+  Args := TIL_PCALL_ARGS.Create;
+  LoadILArgumentInternal(Ctx, PArg, nil);
+  LoadILArgumentInternal(Ctx, TArg, nil);
+
+  PArg.TypeInfo := TArg.TypeInfo;
+  Args.PArg := PArg;
 
   // читаем аргументы вызова
   cnt := Ctx.Stream.ReadStretchUInt;
