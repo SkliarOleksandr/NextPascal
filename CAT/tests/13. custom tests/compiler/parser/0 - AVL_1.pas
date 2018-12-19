@@ -275,7 +275,7 @@ end;
 
 destructor TAVLTree<TKey, TData>.Destroy;
 begin
-  Clear;
+  Clear();
   inherited;
 end;
 

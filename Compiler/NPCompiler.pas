@@ -554,6 +554,8 @@ type
     function CheckAndParseDeprecated(Scope: TScope; CurrToken: TTokenID): TTokenID;
     function CheckAndParseAttribute(Scope: TScope): TTokenID;
     function CheckAndParseProcTypeCallConv(Scope: TScope; TypeDecl: TIDType): TTokenID;
+    function CheckAndCallFuncImplicit(SContext: PSContext; Source: TIDExpression): TIDExpression; overload;
+    procedure CheckAndCallFuncImplicit(const EContext: TEContext); overload;
     //=======================================================================================================================
     /// парсинг выражений
     function ParseArrayMember(var PMContext: TPMContext; Scope: TScope; Decl: TIDDeclaration; out DataType: TIDType; var EContext: TEContext): TTokenID;
@@ -626,6 +628,7 @@ type
     class function CheckImplicit(Source: TIDExpression; Dest: TIDType): TIDDeclaration; static;
 
     {функция MatchImplicit проверяет, возможно ли неявное преобразование и генерирует код преобразования(если нужен)}
+    function MatchImplicitOrNil(SContext: PSContext; Source: TIDExpression; Dest: TIDType): TIDExpression;
     function MatchImplicit3(SContext: PSContext; Source: TIDExpression; Dest: TIDType): TIDExpression; overload;
 
     class procedure CheckAndMatchDerefExpression(SContext: PSContext; var Source: TIDExpression);
@@ -728,6 +731,7 @@ type
 
   TSysFunctionContext = record
     UN: TNPUnit;
+    Scope: TScope;
     ParamsStr: string;
     EContext: PEContext;
     SContext: PSContext;
@@ -2485,7 +2489,7 @@ begin
     Exit(Source.AsType); // нужна еще проверка на констрейты
 end;
 
-function TNPUnit.MatchImplicit3(SContext: PSContext; Source: TIDExpression; Dest: TIDType): TIDExpression;
+function TNPUnit.MatchImplicitOrNil(SContext: PSContext; Source: TIDExpression; Dest: TIDType): TIDExpression;
   function CheckAndCallOperator(SContext: PSContext; OperatorDecl: TIDDeclaration; Src: TIDExpression): TIDExpression;
   var
     CallExpr: TIDCallExpression;
@@ -2511,132 +2515,134 @@ begin
   SrcDTID := SDataType.DataTypeID;
   DstDTID := Dest.DataTypeID;
 
-  try
-    // если источник элемент битового набора(dtSet[i])
-    if (SDataType.DataTypeID = dtBoolean) and (Dest.DataTypeID = dtBoolean) and
-       (Source is TIDMultiExpression) and
-       (TIDMultiExpression(Source).Items[0].DataTypeID = dtSet) then
-    begin
-      Decl := GetTMPVar(SContext, SYSUnit._Boolean);
-      Result := TIDExpression.Create(Decl);
-      ILWrite(SContext, TIL.IL_GetBit(Result, TIDMultiExpression(Source).Items[0], TIDMultiExpression(Source).Items[1]));
+
+  // если источник элемент битового набора(dtSet[i])
+  if (SDataType.DataTypeID = dtBoolean) and (Dest.DataTypeID = dtBoolean) and
+     (Source is TIDMultiExpression) and
+     (TIDMultiExpression(Source).Items[0].DataTypeID = dtSet) then
+  begin
+    Decl := GetTMPVar(SContext, SYSUnit._Boolean);
+    Result := TIDExpression.Create(Decl);
+    ILWrite(SContext, TIL.IL_GetBit(Result, TIDMultiExpression(Source).Items[0], TIDMultiExpression(Source).Items[1]));
+    Exit;
+  end;
+
+  //todo сделать преобразование констант !!! string->ansistring->string
+
+  // ищем явно определенный implicit у источника
+  Decl := SDataType.GetImplicitOperatorTo(Dest);
+  if Decl is TIDInternalOpImplicit then
+  begin
+    Result := TIDInternalOpImplicit(Decl).Match(SContext, Source, Dest);
+    if Assigned(Result) then
       Exit;
-    end;
+    Decl := nil;
+  end;
 
-    //todo сделать преобразование констант !!! string->ansistring->string
-
-    // ищем явно определенный implicit у источника
-    Decl := SDataType.GetImplicitOperatorTo(Dest);
-    if Decl is TIDInternalOpImplicit then
-    begin
-      Result := TIDInternalOpImplicit(Decl).Match(SContext, Source, Dest);
-      if Assigned(Result) then
-        Exit;
-      Decl := nil;
-    end;
-
+  if not Assigned(Decl) then
+  begin
+    // ищем явно определенный implicit у приемника
+    Decl := Dest.GetImplicitOperatorFrom(SDataType);
     if not Assigned(Decl) then
     begin
-      // ищем явно определенный implicit у приемника
-      Decl := Dest.GetImplicitOperatorFrom(SDataType);
+      // если не нашли точных имплиситов, ищем подходящий (у источника)
+      Decl := SDataType.FindImplicitOperatorTo(Dest);
       if not Assigned(Decl) then
       begin
-        // если не нашли точных имплиситов, ищем подходящий (у источника)
-        Decl := SDataType.FindImplicitOperatorTo(Dest);
+        // если не нашли точных имплиситов, ищем подходящий (у приемника)
+        Decl := Dest.FindImplicitOperatorFrom(SDataType);
         if not Assigned(Decl) then
         begin
-          // если не нашли точных имплиситов, ищем подходящий (у приемника)
-          Decl := Dest.FindImplicitOperatorFrom(SDataType);
-          if not Assigned(Decl) then
+          { проверка на nullpointer }
+          if (Source.Declaration = SYSUnit._NullPtrConstant) and
+             (Dest.IsReferenced or (Dest is TIDProcType)) then
+            Exit(Source);
+
+          if (SrcDTID = dtPointer) and (DstDTID = dtPointer) then
           begin
-            { проверка на nullpointer }
-            if (Source.Declaration = SYSUnit._NullPtrConstant) and
-               (Dest.IsReferenced or (Dest is TIDProcType)) then
+            if (TIDPointer(SDataType).ReferenceType = nil) and
+               (TIDPointer(Dest).ReferenceType = nil) then
               Exit(Source);
-
-            if (SrcDTID = dtPointer) and (DstDTID = dtPointer) then
-            begin
-              if (TIDPointer(SDataType).ReferenceType = nil) and
-                 (TIDPointer(Dest).ReferenceType = nil) then
-                Exit(Source);
-              if TIDPointer(SDataType).ReferenceType.ActualDataType = TIDPointer(Dest).ReferenceType.ActualDataType then
-                Exit(Source);
-            end;
-
-            { если оба - классы, то проверяем InheritsForm }
-            if (SrcDTID = dtClass) and (DstDTID = dtClass) then
-            begin
-              if TIDClass(Source.DataType).IsInheritsForm(TIDClass(Dest)) then
-                Exit(Source);
-            end;
-
-            { если классы и интерфейс }
-            if (SrcDTID = dtClass) and (DstDTID = dtInterface) then
-            begin
-              if TIDClass(Source.DataType).FindInterface(TIDInterface(Dest)) then
-                Exit(Source)
-              else
-                ERROR_CLASS_NOT_IMPLEMENT_INTF(Source, Dest);
-            end;
-
-            { есди приемник - class of }
-            if DstDTID = dtClassOf then
-              Decl := MatchImplicitClassOf(Source, TIDClassOf(Dest));
-
-            {дин. массив как набор}
-            if (DstDTID = dtSet) and (SDataType is TIDDynArray) then
-            begin
-              Result := MatchSetImplicit(Source, TIDSet(Dest));
-              Exit;
-            end else
-            if (SrcDTID = dtProcType) and (DstDTID = dtProcType) then
-              Decl := MatchProcedureTypes(TIDProcType(SDataType), TIDProcType(Dest))
-            else
-            if SDataType is TIDArray then
-            begin
-              if Dest is TIDArray then
-                Result := MatchArrayImplicit(SContext, Source, TIDArray(Dest))
-              else
-              if DstDTID = dtRecord then
-                Result := MatchArrayImplicitToRecord(Source, TIDStructure(Dest))
-              else
-                Result := nil;
-              Exit;
-            end;
-            if (SrcDTID = dtRecord) and (DstDTID = dtRecord) then
-            begin
-              Result := MatchRecordImplicit(SContext, Source, TIDRecord(Dest));
-              Exit;
-            end;
-
-            {если generic}
-            if (SrcDTID = dtGeneric) or (DstDTID = dtGeneric) then
-              Exit(Source); // нужна еще проверка на констрейты
+            if TIDPointer(SDataType).ReferenceType.ActualDataType = TIDPointer(Dest).ReferenceType.ActualDataType then
+              Exit(Source);
           end;
+
+          { если оба - классы, то проверяем InheritsForm }
+          if (SrcDTID = dtClass) and (DstDTID = dtClass) then
+          begin
+            if TIDClass(Source.DataType).IsInheritsForm(TIDClass(Dest)) then
+              Exit(Source);
+          end;
+
+          { если классы и интерфейс }
+          if (SrcDTID = dtClass) and (DstDTID = dtInterface) then
+          begin
+            if TIDClass(Source.DataType).FindInterface(TIDInterface(Dest)) then
+              Exit(Source)
+            else
+              ERROR_CLASS_NOT_IMPLEMENT_INTF(Source, Dest);
+          end;
+
+          { есди приемник - class of }
+          if DstDTID = dtClassOf then
+            Decl := MatchImplicitClassOf(Source, TIDClassOf(Dest));
+
+          {дин. массив как набор}
+          if (DstDTID = dtSet) and (SDataType is TIDDynArray) then
+          begin
+            Result := MatchSetImplicit(Source, TIDSet(Dest));
+            Exit;
+          end else
+          if (SrcDTID = dtProcType) and (DstDTID = dtProcType) then
+            Decl := MatchProcedureTypes(TIDProcType(SDataType), TIDProcType(Dest))
+          else
+          if SDataType is TIDArray then
+          begin
+            if Dest is TIDArray then
+              Result := MatchArrayImplicit(SContext, Source, TIDArray(Dest))
+            else
+            if DstDTID = dtRecord then
+              Result := MatchArrayImplicitToRecord(Source, TIDStructure(Dest))
+            else
+              Result := nil;
+            Exit;
+          end;
+          if (SrcDTID = dtRecord) and (DstDTID = dtRecord) then
+          begin
+            Result := MatchRecordImplicit(SContext, Source, TIDRecord(Dest));
+            Exit;
+          end;
+
+          {если generic}
+          if (SrcDTID = dtGeneric) or (DstDTID = dtGeneric) then
+            Exit(Source); // нужна еще проверка на констрейты
         end;
       end;
     end;
-
-    if Source.ClassType = TIDDrefExpression then
-    begin
-      Result := GetTMPVarExpr(SContext, Source.DataType);
-      Result.TextPosition := Source.TextPosition;
-      ILWrite(SContext, TIL.IL_ReadDRef(Result, Source));
-      Exit;
-    end;
-
-    if not Assigned(Decl) then
-      Exit(nil);
-
-    if Decl.ItemType = itType then
-      Exit(Source);
-
-    Result := CheckAndCallOperator(SContext, Decl, Source);
-
-  finally
-    if not Assigned(Result) then
-      ERROR_INCOMPATIBLE_TYPES(Source, Dest);
   end;
+
+  if Source.ClassType = TIDDrefExpression then
+  begin
+    Result := GetTMPVarExpr(SContext, Source.DataType);
+    Result.TextPosition := Source.TextPosition;
+    ILWrite(SContext, TIL.IL_ReadDRef(Result, Source));
+    Exit;
+  end;
+
+  if not Assigned(Decl) then
+    Exit(nil);
+
+  if Decl.ItemType = itType then
+    Exit(Source);
+
+  Result := CheckAndCallOperator(SContext, Decl, Source);
+end;
+
+function TNPUnit.MatchImplicit3(SContext: PSContext; Source: TIDExpression; Dest: TIDType): TIDExpression;
+begin
+  Result := MatchImplicitOrNil(SContext, Source, Dest);
+  if not Assigned(Result) then
+    ERROR_INCOMPATIBLE_TYPES(Source, Dest);
 end;
 
 class function TNPUnit.MatchImplicitClassOf(Source: TIDExpression; Destination: TIDClassOf): TIDDeclaration;
@@ -7180,6 +7186,7 @@ begin
             parser_NextToken(Scope);
             Continue;
           end;
+          CheckAndCallFuncImplicit(EContext);
           CheckUnusedExprResult(EContext);
           Break;
         end;
@@ -8100,6 +8107,7 @@ begin
     ERROR_NOT_ENOUGH_ACTUAL_PARAMS(CallExpr);
 
   Ctx.UN := Self;
+  Ctx.Scope := Scope;
   Ctx.ParamsStr := ParamsText;
   Ctx.EContext := @EContext;
   Ctx.SContext := SContext;
@@ -9756,10 +9764,9 @@ var
   SContext: PSContext;
   EContext: TEContext;
 begin
-  if DataType.DataTypeID = dtStaticArray then
-    Result := ParseVarStaticArrayDefaultValue(Scope, DataType as TIDArray, DefaultValue)
-  else begin
-
+  case DataType.DataTypeID of
+    dtStaticArray: Result := ParseVarStaticArrayDefaultValue(Scope, DataType as TIDArray, DefaultValue);
+  else
     SContext := @fInitProcSConect;
 
     Result := parser_NextToken(Scope);
@@ -12969,9 +12976,13 @@ begin
     ReleaseExpression(Dest);
 
     {находим Implicit оператор}
-    NewSrc := MatchImplicit3(SContext, Source, Dest.DataType);
+    NewSrc := MatchImplicitOrNil(SContext, Source, Dest.DataType);
     if not Assigned(NewSrc) then
-       ERROR_INCOMPATIBLE_TYPES(Source, Dest);
+    begin
+      NewSrc := CheckAndCallFuncImplicit(SContext, Source);
+      if not Assigned(NewSrc) then
+        ERROR_INCOMPATIBLE_TYPES(Source, Dest);
+    end;
     Source := NewSrc;
 
     if Dest.ClassType = TIDDrefExpression then
@@ -14760,6 +14771,33 @@ begin
     Result := Dst
   else
     Result := nil;
+end;
+
+procedure TNPUnit.CheckAndCallFuncImplicit(const EContext: TEContext);
+var
+  Expr: TIDExpression;
+  PExpr: TIDCallExpression;
+begin
+  Expr := EContext.Result;
+  if not Assigned(Expr) then
+    Exit;
+
+  Expr := EContext.RPNPopExpression();
+  Expr := CheckAndCallFuncImplicit(EContext.SContext, Expr);
+  if Assigned(Expr) then
+    EContext.RPNPushExpression(Expr);
+end;
+
+function TNPUnit.CheckAndCallFuncImplicit(SContext: PSContext; Source: TIDExpression): TIDExpression;
+var
+  Expr: TIDExpression;
+  PExpr: TIDCallExpression;
+begin
+  if Source.DataTypeID <> dtProcType then
+    Exit(nil);
+
+  PExpr := TIDCallExpression.Create(Source.Declaration, Source.TextPosition);
+  Result := Process_CALL_direct(SContext, PExpr, []);
 end;
 
 initialization

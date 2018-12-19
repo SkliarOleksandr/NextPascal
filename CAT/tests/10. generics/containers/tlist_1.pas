@@ -59,7 +59,7 @@ begin
     FItems[FCount] := T;
     Inc(FCount);
   end else
-    Grow;       
+    Grow();       
 end;
 
 procedure TList<T>.Delete(Index: Int32);
