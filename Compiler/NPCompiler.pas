@@ -2824,7 +2824,7 @@ end;
 
 class procedure TNPUnit.CheckConstExpression(Expression: TIDExpression);
 begin
-  if Expression.Declaration.ItemType <> itConst then
+  if not (Expression.Declaration.ItemType in [itConst, itProcedure]) then
     ERROR_CONST_EXPRESSION_REQUIRED(Expression);
 end;
 
@@ -6020,6 +6020,7 @@ begin
         if (StopToken = token_end) and (ECnt = 0) then
           Exit;
       end;
+      token_eof: Exit(token_eof);
     end;
   end;
 end;
