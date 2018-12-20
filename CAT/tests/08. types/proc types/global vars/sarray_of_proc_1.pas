@@ -1,4 +1,4 @@
-unit static_array_of_proc_1;
+unit sarray_of_proc_1;
 
 interface
 

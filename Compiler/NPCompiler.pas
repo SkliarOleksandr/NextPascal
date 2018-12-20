@@ -5405,6 +5405,13 @@ begin
     {call} // todo: make this code as main (remove previous same code)
     if Result = token_openround then
     begin
+      if Expression.DataType is TIDArray then
+      begin
+        // if the previous expression was array element[] - generate tmp var for call
+        Expression := ProcessMemberExpression(SContext, WasProperty, PMContext);
+        PMContext.Clear;
+      end;
+
       if Expression.DataTypeID <> dtProcType then
         ERROR_PROC_OR_PROCVAR_REQUIRED(PMContext.ID);
 
