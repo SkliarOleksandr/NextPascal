@@ -2629,8 +2629,24 @@ begin
     Exit;
   end;
 
+  {if Assigned(SDataType.SysImplicitToAny) then
+  begin
+    Result := TIDInternalOpImplicit(SDataType.SysImplicitToAny).Match(SContext, Source, Dest);
+    if Assigned(Result) then
+      Exit;
+    Decl := nil;
+  end;}
+
   if not Assigned(Decl) then
+  begin
+    if Assigned(Dest.SysExplicitFromAny) then
+    begin
+      Result := TIDInternalOpImplicit(Dest.SysExplicitFromAny).Match(SContext, Source, Dest);
+      if Assigned(Result) then
+        Exit;
+    end;
     Exit(nil);
+  end;
 
   if Decl.ItemType = itType then
     Exit(Source);
@@ -2691,7 +2707,7 @@ begin
   if Assigned(Result) then
     Exit;
 
-  ExplicitIntOp := DstDataType.ExplicitFromEny;
+  ExplicitIntOp := DstDataType.SysExplicitFromAny;
   if ExplicitIntOp is TIDInternalOpImplicit then
   begin
     if TIDInternalOpImplicit(ExplicitIntOp).Check(Source, Destination) <> nil then
@@ -6234,8 +6250,11 @@ begin
     if Assigned(DataType) then
     begin
       Result := ParseVarDefaultValue(Scope, DataType, Expr);
-      Expr.Declaration.DataType := DataType;
-      Expr.AsConst.ExplicitDataType := DataType;
+      if Expr.IsConstant then
+      begin
+        Expr.Declaration.DataType := DataType;
+        Expr.AsConst.ExplicitDataType := DataType;
+      end;
     end else begin
       // читаем значение константы
       Result := ParseConstExpression(Scope, Expr, parser_NextToken(Scope), ExprRValue);
@@ -9873,7 +9892,7 @@ begin
       Field.Visibility := Visibility;
 
       // if the init value for global var is not constant value
-      if Assigned(DefaultValue) and DefaultValue.IsTMPVar then
+      if Assigned(DefaultValue) and (DefaultValue.IsTMPVar or DefaultValue.IsProcedure) then
       begin
         ILWrite(@fInitProcSConect, TIL.IL_Move(TIDExpression.Create(Field), DefaultValue));
       end else

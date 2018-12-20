@@ -49,11 +49,6 @@ object frmCATMain: TfrmCATMain
       Margins.Right = 0
       Align = alClient
       Header.AutoSizeIndex = 0
-      Header.Font.Charset = DEFAULT_CHARSET
-      Header.Font.Color = clWindowText
-      Header.Font.Height = -11
-      Header.Font.Name = 'Tahoma'
-      Header.Font.Style = []
       Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowImages, hoShowSortGlyphs, hoVisible]
       Images = ImageList1
       IncrementalSearch = isAll
@@ -67,6 +62,7 @@ object frmCATMain: TfrmCATMain
       OnDrawText = vtTestsDrawText
       OnFreeNode = vtTestsFreeNode
       OnGetText = vtTestsGetText
+      OnGetImageIndex = vtTestsGetImageIndex
       OnGetNodeDataSize = vtTestsGetNodeDataSize
       OnNodeDblClick = vtTestsNodeDblClick
       Columns = <
@@ -345,7 +341,7 @@ object frmCATMain: TfrmCATMain
         Top = 65
         Width = 399
         Height = 370
-        ActivePage = tsCanvas
+        ActivePage = tsVMCode
         Align = alRight
         TabOrder = 3
         object tsILCode: TTabSheet
@@ -679,7 +675,7 @@ object frmCATMain: TfrmCATMain
     Left = 104
     Top = 384
     Bitmap = {
-      494C010107006001100210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107006001200210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
