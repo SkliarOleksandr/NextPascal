@@ -4,7 +4,8 @@
 
 interface
 
-uses SysUtils, StrUtils, DateUtils, Classes, Math, NPCompiler.DataTypes, Types, AVL, TypInfo, AnsiStrings,
+uses SysUtils, StrUtils, DateUtils, Classes, Math, NPCompiler.DataTypes, Types, AVL, TypInfo,
+     AnsiStrings, IniFiles,
      {$IFNDEF FPC}IOUtils{$ELSE}FileUtil{$ENDIF};
 
 const
@@ -167,6 +168,10 @@ type
     procedure WriteDateTime(const Value: TDateTime); inline;
     procedure WriteStretchUInt(const Value: UInt64);
     procedure WriteVarUInt32(const Value: UInt32);
+  end;
+
+  TIniFileHelper = class helper for TIniFile
+    function ReadString(const Section, Ident, Default: string; WriteIfNotExist: boolean): string; overload;
   end;
 
   TCaseInsensitiveObjectList = TAVLTree<string, TObject>;
@@ -1458,6 +1463,20 @@ end;
 procedure TSimpleStack<T>.SetTop(const Value: T);
 begin
   fItems[fCount - 1] := Value;
+end;
+
+{ TIniFileHelper }
+
+function TIniFileHelper.ReadString(const Section, Ident, Default: string;
+  WriteIfNotExist: boolean): string;
+begin
+  if Self.ValueExists(Section, Ident) then
+    Result := ReadString(Section, Ident, Default)
+  else begin
+    Result := Default;
+    if WriteIfNotExist then
+      WriteString(Section, Ident, Default);
+  end;
 end;
 
 initialization

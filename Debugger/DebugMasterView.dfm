@@ -17,61 +17,79 @@ object frmDebugMasterView: TfrmDebugMasterView
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
-  object SpTBXDock1: TSpTBXDock
+  object SpTBXSplitter1: TSplitter
+    Left = 745
+    Top = 26
+    Height = 619
+    Cursor = crSizeWE
+    Align = alRight
+    ExplicitLeft = 743
+  end
+  object SpTBXSplitter4: TSplitter
+    Left = 281
+    Top = 26
+    Height = 619
+    Cursor = crSizeWE
+  end
+  object SpTBXDock1: TPanel
     Left = 0
     Top = 0
     Width = 1025
     Height = 26
-    object tbMain: TSpTBXToolbar
+    Align = alTop
+    TabOrder = 0
+    object tbMain: TToolBar
       Left = 1
-      Top = 0
-      DockPos = 1
+      Top = 1
+      Width = 1023
+      Height = 29
       Images = ImageList1
       ParentShowHint = False
       ShowHint = True
       TabOrder = 0
-      object SpTBXItem5: TSpTBXItem
+      object SpTBXItem5: TToolButton
+        Left = 0
+        Top = 0
         Action = actRun
-        DisplayMode = nbdmImageAndText
       end
-      object SpTBXItem7: TSpTBXItem
+      object SpTBXItem7: TToolButton
+        Left = 23
+        Top = 0
         Action = actStartTrace
-        DisplayMode = nbdmImageAndText
       end
-      object SpTBXItem2: TSpTBXItem
+      object SpTBXItem2: TToolButton
+        Left = 46
+        Top = 0
         Action = actStop
-        DisplayMode = nbdmImageAndText
       end
-      object SpTBXItem4: TSpTBXItem
+      object SpTBXItem4: TToolButton
+        Left = 69
+        Top = 0
         Action = actStepInto
-        DisplayMode = nbdmImageAndText
       end
-      object SpTBXItem3: TSpTBXItem
+      object SpTBXItem3: TToolButton
+        Left = 92
+        Top = 0
         Action = actStepOver
-        DisplayMode = nbdmImageAndText
       end
-      object SpTBXItem1: TSpTBXItem
+      object SpTBXItem1: TToolButton
+        Left = 115
+        Top = 0
         Action = actRunUntilRet
-        DisplayMode = nbdmImageAndText
       end
     end
   end
   object pnlClient: TPanel
-    Left = 286
+    Left = 284
     Top = 26
-    Width = 457
+    Width = 461
     Height = 619
     Align = alClient
     BevelOuter = bvNone
     ShowCaption = False
     TabOrder = 1
-  end
-  object SpTBXSplitter1: TSpTBXSplitter
-    Left = 743
-    Top = 26
-    Height = 619
-    Cursor = crSizeWE
-    Align = alRight
+    ExplicitTop = 0
+    ExplicitHeight = 645
   end
   object pnlRight: TPanel
     Left = 748
@@ -83,6 +101,24 @@ object frmDebugMasterView: TfrmDebugMasterView
     Caption = 'aaa'
     ShowCaption = False
     TabOrder = 3
+    ExplicitTop = 0
+    ExplicitHeight = 645
+    object SpTBXSplitter2: TSplitter
+      Left = 0
+      Top = 169
+      Width = 277
+      Height = 5
+      Cursor = crSizeNS
+      Align = alTop
+    end
+    object SpTBXSplitter3: TSplitter
+      Left = 0
+      Top = 409
+      Width = 277
+      Height = 5
+      Cursor = crSizeNS
+      Align = alTop
+    end
     object pnlGlobalVars: TPanel
       Left = 0
       Top = 414
@@ -91,6 +127,7 @@ object frmDebugMasterView: TfrmDebugMasterView
       Align = alClient
       BevelOuter = bvNone
       TabOrder = 0
+      ExplicitHeight = 231
       object vtGloabalVars: TVirtualStringTree
         Left = 0
         Top = 17
@@ -98,11 +135,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         Height = 188
         Align = alClient
         Header.AutoSizeIndex = 1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
@@ -111,21 +143,22 @@ object frmDebugMasterView: TfrmDebugMasterView
         OnFreeNode = vtLocalVarsFreeNode
         OnGetText = vtGloabalVarsGetText
         OnGetNodeDataSize = vtGloabalVarsGetNodeDataSize
+        ExplicitHeight = 214
         Columns = <
           item
             Position = 0
+            Text = 'Variable'
             Width = 66
-            WideText = 'Variable'
           end
           item
             Position = 1
-            Width = 140
-            WideText = 'Value'
+            Text = 'Value'
+            Width = 136
           end
           item
             Position = 2
+            Text = 'Type'
             Width = 71
-            WideText = 'Type'
           end>
       end
       object Panel3: TPanel
@@ -156,11 +189,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         Height = 152
         Align = alClient
         Header.AutoSizeIndex = 1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
@@ -172,13 +200,13 @@ object frmDebugMasterView: TfrmDebugMasterView
         Columns = <
           item
             Position = 0
+            Text = 'Register'
             Width = 55
-            WideText = 'Register'
           end
           item
             Position = 1
-            Width = 222
-            WideText = 'Value'
+            Text = 'Value'
+            Width = 218
           end>
       end
       object Panel1: TPanel
@@ -194,22 +222,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         TabOrder = 1
       end
     end
-    object SpTBXSplitter2: TSpTBXSplitter
-      Left = 0
-      Top = 169
-      Width = 277
-      Height = 5
-      Cursor = crSizeNS
-      Align = alTop
-    end
-    object SpTBXSplitter3: TSpTBXSplitter
-      Left = 0
-      Top = 409
-      Width = 277
-      Height = 5
-      Cursor = crSizeNS
-      Align = alTop
-    end
     object pnlLocalVars: TPanel
       Left = 0
       Top = 174
@@ -217,7 +229,7 @@ object frmDebugMasterView: TfrmDebugMasterView
       Height = 235
       Align = alTop
       BevelOuter = bvNone
-      TabOrder = 4
+      TabOrder = 2
       object vtLocalVars: TVirtualStringTree
         Left = 0
         Top = 17
@@ -225,11 +237,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         Height = 218
         Align = alClient
         Header.AutoSizeIndex = 1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
@@ -241,13 +248,13 @@ object frmDebugMasterView: TfrmDebugMasterView
         Columns = <
           item
             Position = 0
+            Text = 'Variable'
             Width = 66
-            WideText = 'Variable'
           end
           item
             Position = 1
-            Width = 211
-            WideText = 'Value'
+            Text = 'Value'
+            Width = 207
           end>
       end
       object Panel2: TPanel
@@ -264,36 +271,30 @@ object frmDebugMasterView: TfrmDebugMasterView
       end
     end
   end
-  object SpTBXStatusBar1: TSpTBXStatusBar
+  object SpTBXStatusBar1: TStatusBar
     Left = 0
     Top = 645
     Width = 1025
     Height = 26
-  end
-  object SpTBXSplitter4: TSpTBXSplitter
-    Left = 281
-    Top = 26
-    Height = 619
-    Cursor = crSizeWE
+    Panels = <>
   end
   object pcUnits: TPageControl
-    Left = 286
+    Left = 284
     Top = 26
-    Width = 457
+    Width = 461
     Height = 619
     ActivePage = tsASMView
     Align = alClient
-    TabOrder = 6
+    TabOrder = 4
+    ExplicitTop = 0
+    ExplicitHeight = 645
     object tsASMView: TTabSheet
       Caption = 'ASM'
-      ExplicitLeft = 0
-      ExplicitTop = 0
-      ExplicitWidth = 0
-      ExplicitHeight = 0
+      ExplicitHeight = 617
       object edVMCode: TSynEdit
         Left = 0
         Top = 0
-        Width = 449
+        Width = 453
         Height = 591
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
@@ -302,6 +303,14 @@ object frmDebugMasterView: TfrmDebugMasterView
         Font.Name = 'Courier New'
         Font.Style = []
         TabOrder = 0
+        CodeFolding.GutterShapeSize = 11
+        CodeFolding.CollapsedLineColor = clGrayText
+        CodeFolding.FolderBarLinesColor = clGrayText
+        CodeFolding.IndentGuidesColor = clGray
+        CodeFolding.IndentGuides = True
+        CodeFolding.ShowCollapsedLine = False
+        CodeFolding.ShowHintMark = True
+        UseCodeFolding = False
         BookMarkOptions.BookmarkImages = ImageList2
         BookMarkOptions.XOffset = 8
         BorderStyle = bsNone
@@ -316,6 +325,7 @@ object frmDebugMasterView: TfrmDebugMasterView
         OnGutterClick = edVMCodeGutterClick
         OnSpecialLineColors = edVMCodeSpecialLineColors
         FontSmoothing = fsmNone
+        ExplicitHeight = 617
       end
     end
   end
@@ -326,7 +336,17 @@ object frmDebugMasterView: TfrmDebugMasterView
     Height = 619
     Align = alLeft
     ShowCaption = False
-    TabOrder = 7
+    TabOrder = 5
+    ExplicitTop = 0
+    ExplicitHeight = 645
+    object SpTBXSplitter5: TSplitter
+      Left = 1
+      Top = 242
+      Width = 279
+      Height = 5
+      Cursor = crSizeNS
+      Align = alTop
+    end
     object pnlWhatchView: TPanel
       Left = 1
       Top = 247
@@ -336,6 +356,7 @@ object frmDebugMasterView: TfrmDebugMasterView
       BevelOuter = bvNone
       ShowCaption = False
       TabOrder = 0
+      ExplicitHeight = 397
       object VirtualStringTree1: TVirtualStringTree
         Left = 0
         Top = 17
@@ -343,11 +364,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         Height = 354
         Align = alClient
         Header.AutoSizeIndex = -1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
@@ -356,11 +372,12 @@ object frmDebugMasterView: TfrmDebugMasterView
         OnFreeNode = VirtualStringTree1FreeNode
         OnGetText = vtCallStackGetText
         OnGetNodeDataSize = vtCallStackGetNodeDataSize
+        ExplicitHeight = 380
         Columns = <
           item
             Position = 0
-            Width = 279
-            WideText = 'Expression'
+            Text = 'Expression'
+            Width = 275
           end>
       end
       object Panel7: TPanel
@@ -392,11 +409,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         Height = 224
         Align = alClient
         Header.AutoSizeIndex = -1
-        Header.Font.Charset = DEFAULT_CHARSET
-        Header.Font.Color = clWindowText
-        Header.Font.Height = -11
-        Header.Font.Name = 'Tahoma'
-        Header.Font.Style = []
         Header.Options = [hoAutoResize, hoColumnResize, hoDrag, hoShowSortGlyphs, hoVisible, hoAutoSpring]
         TabOrder = 0
         TreeOptions.PaintOptions = [toShowButtons, toShowDropmark, toThemeAware, toUseBlendedImages]
@@ -408,8 +420,8 @@ object frmDebugMasterView: TfrmDebugMasterView
         Columns = <
           item
             Position = 0
-            Width = 279
-            WideText = 'Procedure'
+            Text = 'Procedure'
+            Width = 275
           end>
       end
       object Panel5: TPanel
@@ -424,14 +436,6 @@ object frmDebugMasterView: TfrmDebugMasterView
         ParentBackground = False
         TabOrder = 1
       end
-    end
-    object SpTBXSplitter5: TSpTBXSplitter
-      Left = 1
-      Top = 242
-      Width = 279
-      Height = 5
-      Cursor = crSizeNS
-      Align = alTop
     end
   end
   object ActionList1: TActionList
@@ -603,7 +607,7 @@ object frmDebugMasterView: TfrmDebugMasterView
     Left = 352
     Top = 368
     Bitmap = {
-      494C010105000800700010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010105000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
@@ -879,7 +883,7 @@ object frmDebugMasterView: TfrmDebugMasterView
     Left = 368
     Top = 232
     Bitmap = {
-      494C010102000800540010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010102000800040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000001000000001002000000000000010
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

@@ -2,7 +2,7 @@ object frmCATMain: TfrmCATMain
   Left = 0
   Top = 0
   Caption = 'Compiler auto test'
-  ClientHeight = 665
+  ClientHeight = 659
   ClientWidth = 1120
   Color = clBtnFace
   DoubleBuffered = True
@@ -24,28 +24,30 @@ object frmCATMain: TfrmCATMain
     Left = 297
     Top = 54
     Width = 5
-    Height = 586
+    Height = 580
     Margins.Left = 0
     Margins.Right = 0
     Color = clBtnShadow
     ParentColor = False
     ResizeStyle = rsUpdate
+    ExplicitHeight = 586
   end
   object Panel1: TPanel
     Left = 0
     Top = 51
     Width = 297
-    Height = 592
+    Height = 586
     Align = alLeft
     BevelOuter = bvNone
     ShowCaption = False
     TabOrder = 0
+    ExplicitHeight = 592
     object vtTests: TVirtualStringTree
       AlignWithMargins = True
       Left = 3
       Top = 3
       Width = 294
-      Height = 586
+      Height = 580
       Margins.Right = 0
       Align = alClient
       Header.AutoSizeIndex = 0
@@ -65,18 +67,19 @@ object frmCATMain: TfrmCATMain
       OnGetImageIndex = vtTestsGetImageIndex
       OnGetNodeDataSize = vtTestsGetNodeDataSize
       OnNodeDblClick = vtTestsNodeDblClick
+      ExplicitHeight = 586
       Columns = <
         item
           Position = 0
+          Text = 'test'
           Width = 210
-          WideText = 'test'
         end
         item
           MaxWidth = 80
           MinWidth = 80
           Position = 1
+          Text = 'result'
           Width = 80
-          WideText = 'result'
         end>
     end
   end
@@ -85,19 +88,21 @@ object frmCATMain: TfrmCATMain
     Left = 302
     Top = 54
     Width = 815
-    Height = 587
+    Height = 581
     Margins.Left = 0
     Margins.Bottom = 2
     ActivePage = tsSrcEditor
     Align = alClient
     TabOrder = 1
+    ExplicitHeight = 587
     object tsMessages: TTabSheet
       Caption = 'Test results'
+      ExplicitHeight = 559
       object edMessages: TSynEdit
         Left = 0
         Top = 0
         Width = 807
-        Height = 559
+        Height = 553
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -120,14 +125,16 @@ object frmCATMain: TfrmCATMain
         Gutter.Font.Style = []
         Highlighter = SynPasSyn1
         FontSmoothing = fsmNone
+        ExplicitHeight = 559
       end
     end
     object tsSrcEditor: TTabSheet
       Caption = 'test source'
       ImageIndex = 1
+      ExplicitHeight = 559
       object Splitter2: TSplitter
         Left = 0
-        Top = 435
+        Top = 429
         Width = 807
         Height = 5
         Cursor = crVSplit
@@ -135,22 +142,24 @@ object frmCATMain: TfrmCATMain
         Color = clBtnShadow
         ParentColor = False
         ResizeStyle = rsUpdate
+        ExplicitTop = 435
       end
       object Splitter3: TSplitter
         Left = 403
         Top = 65
         Width = 5
-        Height = 370
+        Height = 364
         Align = alRight
         Color = clBtnShadow
         ParentColor = False
         ResizeStyle = rsUpdate
+        ExplicitHeight = 370
       end
       object edSource: TSynEdit
         Left = 0
         Top = 65
         Width = 403
-        Height = 370
+        Height = 364
         Align = alClient
         Font.Charset = DEFAULT_CHARSET
         Font.Color = clWindowText
@@ -179,6 +188,7 @@ object frmCATMain: TfrmCATMain
         TabWidth = 2
         OnChange = edSourceChange
         FontSmoothing = fsmNone
+        ExplicitHeight = 370
       end
       object Panel3: TPanel
         Left = 0
@@ -304,7 +314,7 @@ object frmCATMain: TfrmCATMain
       end
       object edSrcMessages: TSynEdit
         Left = 0
-        Top = 440
+        Top = 434
         Width = 807
         Height = 119
         Align = alBottom
@@ -335,22 +345,25 @@ object frmCATMain: TfrmCATMain
         WordWrap = True
         OnChange = edSourceChange
         FontSmoothing = fsmNone
+        ExplicitTop = 440
       end
       object PageControl2: TPageControl
         Left = 408
         Top = 65
         Width = 399
-        Height = 370
+        Height = 364
         ActivePage = tsVMCode
         Align = alRight
         TabOrder = 3
+        ExplicitHeight = 370
         object tsILCode: TTabSheet
           Caption = 'IL Code'
+          ExplicitHeight = 342
           object edILCode: TSynEdit
             Left = 0
             Top = 0
             Width = 391
-            Height = 342
+            Height = 336
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -381,16 +394,18 @@ object frmCATMain: TfrmCATMain
             SearchEngine = SynEditSearch1
             OnChange = edSourceChange
             FontSmoothing = fsmNone
+            ExplicitHeight = 342
           end
         end
         object tsVMCode: TTabSheet
           Caption = 'VM Code'
           ImageIndex = 1
+          ExplicitHeight = 342
           object edVMCode: TSynEdit
             Left = 0
             Top = 0
             Width = 391
-            Height = 342
+            Height = 336
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -420,16 +435,18 @@ object frmCATMain: TfrmCATMain
             SearchEngine = SynEditSearch1
             OnChange = edSourceChange
             FontSmoothing = fsmNone
+            ExplicitHeight = 342
           end
         end
         object tsVMOut: TTabSheet
           Caption = 'VM Out'
           ImageIndex = 2
+          ExplicitHeight = 342
           object edVMOut: TSynEdit
             Left = 0
             Top = 0
             Width = 391
-            Height = 342
+            Height = 336
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -457,16 +474,18 @@ object frmCATMain: TfrmCATMain
             Highlighter = SynPasSyn1
             OnChange = edSourceChange
             FontSmoothing = fsmNone
+            ExplicitHeight = 342
           end
         end
         object tsConsole: TTabSheet
           Caption = 'Console'
           ImageIndex = 3
+          ExplicitHeight = 342
           object edConsole: TSynEdit
             Left = 0
             Top = 0
             Width = 391
-            Height = 342
+            Height = 336
             Align = alClient
             Font.Charset = DEFAULT_CHARSET
             Font.Color = clWindowText
@@ -494,17 +513,20 @@ object frmCATMain: TfrmCATMain
             Highlighter = SynPasSyn1
             OnChange = edSourceChange
             FontSmoothing = fsmNone
+            ExplicitHeight = 342
           end
         end
         object tsCanvas: TTabSheet
           Caption = 'Canvas'
           ImageIndex = 4
+          ExplicitHeight = 342
           object Image1: TImage
             Left = 0
             Top = 0
             Width = 391
-            Height = 342
+            Height = 336
             Align = alClient
+            ExplicitHeight = 342
           end
         end
       end
@@ -627,7 +649,7 @@ object frmCATMain: TfrmCATMain
   object stBar: TStatusBar
     AlignWithMargins = True
     Left = 3
-    Top = 643
+    Top = 637
     Width = 1114
     Height = 19
     Margins.Top = 0
@@ -648,6 +670,7 @@ object frmCATMain: TfrmCATMain
       item
         Width = 50
       end>
+    ExplicitTop = 643
   end
   object chkRunCppVMTest: TCheckBox
     Left = 473
@@ -675,7 +698,7 @@ object frmCATMain: TfrmCATMain
     Left = 104
     Top = 384
     Bitmap = {
-      494C010107006001200210001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
+      494C010107006001040010001000FFFFFFFF2110FFFFFFFFFFFFFFFF424D3600
       0000000000003600000028000000400000002000000001002000000000000020
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000

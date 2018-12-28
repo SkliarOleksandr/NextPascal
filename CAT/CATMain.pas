@@ -8,8 +8,8 @@ uses
   Generics.Collections, SynEditHighlighter, SynHighlighterPas, SynHighlighterGeneral, Vcl.Buttons, System.Actions,
   Vcl.ActnList, SynEditTypes, System.UITypes, IL2VMTranslator, VM.Core, NPCompiler.DataTypes, IL.TypeInfo, SystemUnit,
   IniFiles, Vcl.Menus, Vcl.ToolWin, System.ImageList, NPCompiler, RTTI, NPCompiler.Classes,
-  NPCompiler.Utils, VM.Invoke, SynEditMiscClasses, SynEditSearch, DebugMasterView, Math, SynCompletionProposal, SpTBXItem,
-  SpTBXControls, SynEditCodeFolding, IL2LLVMTranslator; //system
+  NPCompiler.Utils, VM.Invoke, SynEditMiscClasses, SynEditSearch, DebugMasterView, Math, SynCompletionProposal,
+  SynEditCodeFolding, IL2LLVMTranslator; //system
 
 type
 
@@ -881,24 +881,24 @@ end;
 
 procedure TfrmCATMain.FormCreate(Sender: TObject);
 begin
-  FTests := TList<PNodeData>.Create;
+  FTests := TList<PNodeData>.Create();
   PageControl1.ActivePage := tsSrcEditor;
   PageControl2.ActivePage := tsILCode;
   FILStream := TMemoryStream.Create;
 
   FIniFile := TIniFile.Create(ExtractFilePath(Application.ExeName) + 'CAT.ini');
 
-  FRootPath := FIniFile.ReadString('COMMON', 'TESTS_PATH', 'Tests\');
+  FRootPath := FIniFile.ReadString('COMMON', 'TESTS_PATH', '..\..\CAT\Tests\', True);
   if IsRelativePath(FRootPath) then
     FRootPath := (TPath.GetFullPath(ExtractFilePath(Application.ExeName) + FRootPath));
 
-  FUnitsPath := FIniFile.ReadString('COMMON', 'UNITS_PATH', '..\..\Units');
+  FUnitsPath := FIniFile.ReadString('COMMON', 'UNITS_PATH', '..\..\Units\', True);
   if IsRelativePath(FUnitsPath) then
     FUnitsPath := IncludeTrailingPathDelimiter(TPath.GetFullPath(ExtractFilePath(Application.ExeName) + FUnitsPath));
 
-  FNodePath := FIniFile.ReadString('COMMON', 'NODEJS_PATH', 'c:\Program Files\nodejs\node.exe');
+  FNodePath := FIniFile.ReadString('COMMON', 'NODEJS_PATH', 'c:\Program Files\nodejs\node.exe', True);
 
-  FLastSelectedTest := FIniFile.ReadString('COMMON', 'LAST_SELECTED', '');
+  FLastSelectedTest := FIniFile.ReadString('COMMON', 'LAST_SELECTED', '', True);
   if IsRelativePath(FLastSelectedTest) then
     FLastSelectedTest := TPath.GetFullPath(ExtractFilePath(Application.ExeName) + FLastSelectedTest);
 
@@ -1108,7 +1108,7 @@ var
   VMRunTime: TDateTime;
   PKG: INPPackage;
 begin
-  if Assigned(FSelected.Package) then
+  if Assigned(FSelected) and Assigned(FSelected.Package) then
     FSelected.Package.Clear;
 
   FreeAndNil(SYSUnit);

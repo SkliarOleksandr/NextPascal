@@ -4,10 +4,10 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics, Vcl.Controls, Vcl.Forms,
-  Vcl.Dialogs, Vcl.ExtCtrls, TB2Dock, TB2Toolbar, SpTBXItem, SpTBXDkPanels, SynEdit, VirtualTrees, System.Actions, Vcl.ActnList,
-  TB2Item, NPCompiler, IL2VMTranslator, VM.Core, NPCompiler.Classes, NPCompiler.Utils, VMDebuggerCore, SynEditHighlighter,
+  Vcl.Dialogs, Vcl.ExtCtrls, SynEdit, VirtualTrees, System.Actions, Vcl.ActnList,
+  NPCompiler, IL2VMTranslator, VM.Core, NPCompiler.Classes, NPCompiler.Utils, VMDebuggerCore, SynEditHighlighter,
   SynHighlighterGeneral, System.ImageList, Generics.Collections, Vcl.ImgList, Vcl.StdCtrls, Vcl.ComCtrls, DebugUnitView,
-  System.UITypes;
+  System.UITypes, Vcl.ToolWin;
 
 type
 
@@ -20,29 +20,29 @@ type
   TUnitViews = array of TUnitViewInfo;
 
   TfrmDebugMasterView = class(TForm)
-    SpTBXDock1: TSpTBXDock;
-    tbMain: TSpTBXToolbar;
+    SpTBXDock1: TPanel;
+    tbMain: TToolBar;
     pnlClient: TPanel;
-    SpTBXSplitter1: TSpTBXSplitter;
+    SpTBXSplitter1: TSplitter;
     pnlRight: TPanel;
     pnlGlobalVars: TPanel;
     pnlRegs: TPanel;
-    SpTBXSplitter2: TSpTBXSplitter;
+    SpTBXSplitter2: TSplitter;
     vtRegisters: TVirtualStringTree;
     vtGloabalVars: TVirtualStringTree;
-    SpTBXStatusBar1: TSpTBXStatusBar;
+    SpTBXStatusBar1: TStatusBar;
     ActionList1: TActionList;
     actRun: TAction;
     actStop: TAction;
     actStepInto: TAction;
     actStepOver: TAction;
     actRunUntilRet: TAction;
-    SpTBXItem1: TSpTBXItem;
-    SpTBXItem2: TSpTBXItem;
-    SpTBXItem3: TSpTBXItem;
-    SpTBXItem4: TSpTBXItem;
-    SpTBXItem5: TSpTBXItem;
-    SpTBXSplitter3: TSpTBXSplitter;
+    SpTBXItem1: TToolButton;
+    SpTBXItem2: TToolButton;
+    SpTBXItem3: TToolButton;
+    SpTBXItem4: TToolButton;
+    SpTBXItem5: TToolButton;
+    SpTBXSplitter3: TSplitter;
     pnlLocalVars: TPanel;
     vtLocalVars: TVirtualStringTree;
     Panel1: TPanel;
@@ -52,10 +52,10 @@ type
     pnlCallStack: TPanel;
     vtCallStack: TVirtualStringTree;
     Panel5: TPanel;
-    SpTBXSplitter4: TSpTBXSplitter;
+    SpTBXSplitter4: TSplitter;
     ImageList1: TImageList;
     ImageList2: TImageList;
-    SpTBXItem7: TSpTBXItem;
+    SpTBXItem7: TToolButton;
     actStartTrace: TAction;
     pcUnits: TPageControl;
     tsASMView: TTabSheet;
@@ -64,7 +64,7 @@ type
     VirtualStringTree1: TVirtualStringTree;
     Panel7: TPanel;
     pnlLeft: TPanel;
-    SpTBXSplitter5: TSpTBXSplitter;
+    SpTBXSplitter5: TSplitter;
     procedure FormDestroy(Sender: TObject);
     procedure actStepIntoExecute(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
