@@ -1,4 +1,4 @@
-unit NPCompiler.ExpressionContext;
+п»їunit NPCompiler.ExpressionContext;
 
 interface
 
@@ -12,22 +12,22 @@ type
   type
     TNodeOrientation = (NodeRoot, NodeLeft, NodeRight);
     TNodeType = (
-      ntCmp,   // любое сравнение
-      ntAnd,   // логическое AND
-      ntOr     // логическое OR
+      ntCmp,   // Р»СЋР±РѕРµ СЃСЂР°РІРЅРµРЅРёРµ
+      ntAnd,   // Р»РѕРіРёС‡РµСЃРєРѕРµ AND
+      ntOr     // Р»РѕРіРёС‡РµСЃРєРѕРµ OR
     );
   var
-    NodeType: TNodeType;             // Тип нода
-    Parent: PBoolExprNode;           // Parent в дереве
-    Orientation: TNodeOrientation;   // Ориентация нода относительно Parent-а
-    Instruction: TILInstruction;     // это последняя инструкция выражения; для типа ntNode это JMP инструкция
-                                     // для типов ntAnd, ntOr это IL последняя инструкциия правого выражения
-    LeftChild: PBoolExprNode;        // Левый child
-    RightChild: PBoolExprNode;       // Правый child
-    Condition: TILCondition;         // Условия сравнения (только для типа ntNode)
-    LeftNode: PBoolExprNode;         // Левый нод (по исходному коду)
-    RightNode: PBoolExprNode;        // Правый нод (по исходному коду)
-    PrevNode: PBoolExprNode;         // Предыдущий нод (в стеке)
+    NodeType: TNodeType;             // РўРёРї РЅРѕРґР°
+    Parent: PBoolExprNode;           // Parent РІ РґРµСЂРµРІРµ
+    Orientation: TNodeOrientation;   // РћСЂРёРµРЅС‚Р°С†РёСЏ РЅРѕРґР° РѕС‚РЅРѕСЃРёС‚РµР»СЊРЅРѕ Parent-Р°
+    Instruction: TILInstruction;     // СЌС‚Рѕ РїРѕСЃР»РµРґРЅСЏСЏ РёРЅСЃС‚СЂСѓРєС†РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ; РґР»СЏ С‚РёРїР° ntNode СЌС‚Рѕ JMP РёРЅСЃС‚СЂСѓРєС†РёСЏ
+                                     // РґР»СЏ С‚РёРїРѕРІ ntAnd, ntOr СЌС‚Рѕ IL РїРѕСЃР»РµРґРЅСЏСЏ РёРЅСЃС‚СЂСѓРєС†РёРёСЏ РїСЂР°РІРѕРіРѕ РІС‹СЂР°Р¶РµРЅРёСЏ
+    LeftChild: PBoolExprNode;        // Р›РµРІС‹Р№ child
+    RightChild: PBoolExprNode;       // РџСЂР°РІС‹Р№ child
+    Condition: TILCondition;         // РЈСЃР»РѕРІРёСЏ СЃСЂР°РІРЅРµРЅРёСЏ (С‚РѕР»СЊРєРѕ РґР»СЏ С‚РёРїР° ntNode)
+    LeftNode: PBoolExprNode;         // Р›РµРІС‹Р№ РЅРѕРґ (РїРѕ РёСЃС…РѕРґРЅРѕРјСѓ РєРѕРґСѓ)
+    RightNode: PBoolExprNode;        // РџСЂР°РІС‹Р№ РЅРѕРґ (РїРѕ РёСЃС…РѕРґРЅРѕРјСѓ РєРѕРґСѓ)
+    PrevNode: PBoolExprNode;         // РџСЂРµРґС‹РґСѓС‰РёР№ РЅРѕРґ (РІ СЃС‚РµРєРµ)
   end;
 
   TExpessionPosition = (ExprNested, ExprLValue, ExprRValue, ExprNestedGeneric);
@@ -42,20 +42,20 @@ type
   private
     fRPNOArray: TRPNItems;              // Operations array
     fRPNEArray: TIDExpressions;         // Operands array
-    fRPNOArrayLen: Integer;             // пердвычисленный размер входного списка
-    fRPNOpCount: Integer;               // указывает на следющий свободный элемент входного списка
-    fRPNEArrayLen: Integer;             // пердвычисленный размер выходного списка
-    fRPNExprCount: Integer;             // указывает на следющий свободный элемент выходного списка
+    fRPNOArrayLen: Integer;             // РїРµСЂРґРІС‹С‡РёСЃР»РµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ РІС…РѕРґРЅРѕРіРѕ СЃРїРёСЃРєР°
+    fRPNOpCount: Integer;               // СѓРєР°Р·С‹РІР°РµС‚ РЅР° СЃР»РµРґСЋС‰РёР№ СЃРІРѕР±РѕРґРЅС‹Р№ СЌР»РµРјРµРЅС‚ РІС…РѕРґРЅРѕРіРѕ СЃРїРёСЃРєР°
+    fRPNEArrayLen: Integer;             // РїРµСЂРґРІС‹С‡РёСЃР»РµРЅРЅС‹Р№ СЂР°Р·РјРµСЂ РІС‹С…РѕРґРЅРѕРіРѕ СЃРїРёСЃРєР°
+    fRPNExprCount: Integer;             // СѓРєР°Р·С‹РІР°РµС‚ РЅР° СЃР»РµРґСЋС‰РёР№ СЃРІРѕР±РѕРґРЅС‹Р№ СЌР»РµРјРµРЅС‚ РІС‹С…РѕРґРЅРѕРіРѕ СЃРїРёСЃРєР°
     fRPNLastOp: TOperatorID;
     fRPNPrevPriority: Integer;
     fProcessProc: TRPNPocessProc;
-    fPosition: TExpessionPosition;      // позиция выражения (Nested, LValue, RValue...);
+    fPosition: TExpessionPosition;      // РїРѕР·РёС†РёСЏ РІС‹СЂР°Р¶РµРЅРёСЏ (Nested, LValue, RValue...);
     procedure RPNCheckInputSize;
     function GetExpression: TIDExpression;
   public
-    SContext: PSContext;             // statement контекст
-    LastBoolNode: PBoolExprNode;     // содерижт Root узел boolean выражений
-    LastInstruction: TILInstruction; // последняя инструкция на момент начала выражения
+    SContext: PSContext;             // statement РєРѕРЅС‚РµРєСЃС‚
+    LastBoolNode: PBoolExprNode;     // СЃРѕРґРµСЂРёР¶С‚ Root СѓР·РµР» boolean РІС‹СЂР°Р¶РµРЅРёР№
+    LastInstruction: TILInstruction; // РїРѕСЃР»РµРґРЅСЏСЏ РёРЅСЃС‚СЂСѓРєС†РёСЏ РЅР° РјРѕРјРµРЅС‚ РЅР°С‡Р°Р»Р° РІС‹СЂР°Р¶РµРЅРёСЏ
     procedure Initialize(const ProcessProc: TRPNPocessProc);
     procedure Reset;                 // clear RPN stack and reinit
     procedure RPNPushExpression(Expr: TIDExpression);
@@ -275,3 +275,4 @@ begin
 end;
 
 end.
+
